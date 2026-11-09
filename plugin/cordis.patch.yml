@@ -1,0 +1,7 @@
+- insert:
+    - id: dsh-note
+      name: '@local/dsh-note'
+      config:
+        # 留空时使用「默认工作目录/notes」；绝对路径也可以直接写在这里。
+        # 运行中改目录：设置 → 笔记 → 笔记库目录（写入 profile 覆盖层，无需改这个文件）。
+        rootDir: ''

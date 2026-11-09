@@ -1,0 +1,47 @@
+{
+  "name": "@local/dsh-note",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SivanCola/dsh-note.git"
+  },
+  "homepage": "https://github.com/SivanCola/dsh-note#readme",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "notes",
+    "markdown",
+    "local-first"
+  ],
+  "description": "Local Markdown notes panel for the DeepSeek Harness Web UI: three-column vault, split Markdown preview, todos, tags, and one-click session-to-note deposit.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check index.js && node --check client.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

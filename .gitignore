@@ -1,0 +1,9 @@
+# Note vaults are personal data, not source.
+notes/
+
+# Reference screenshots and scratch material.
+.refs/
+
+node_modules/
+.DS_Store
+*.log

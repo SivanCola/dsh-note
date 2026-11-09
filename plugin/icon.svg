@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Local notes">
+  <defs>
+    <linearGradient id="dn-page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8f1f9"/>
+    </linearGradient>
+    <linearGradient id="dn-cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f86c9"/>
+      <stop offset="1" stop-color="#1d5f96"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#dn-cover)"/>
+  <rect x="13" y="10" width="38" height="44" rx="5" fill="url(#dn-page)"/>
+  <rect x="13" y="10" width="7" height="44" rx="3.5" fill="#1d5f96" opacity="0.35"/>
+  <path d="M38 10h8v16l-4-3.6-4 3.6z" fill="#e8a33d"/>
+  <g stroke="#5b7f9c" stroke-width="2.6" stroke-linecap="round">
+    <path d="M26 24h16"/>
+    <path d="M26 32h16"/>
+    <path d="M26 40h10"/>
+  </g>
+  <circle cx="41" cy="44" r="6.5" fill="#2f86c9"/>
+  <path d="M38 44l2.2 2.3L44.5 42" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
