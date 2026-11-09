@@ -27,7 +27,7 @@
 
 ## 数据在哪
 
-默认库目录：`rootDir` 留空时是「Harness 默认工作目录 / notes」（也可以用环境变量 `DSH_NOTES_DIR` 指定）。改目录有两个入口：`设置 → 笔记 → 笔记库目录`（推荐，保存后插件自动重载并立即生效，写入 profile 覆盖层），或修改 `plugin/cordis.patch.yml` 的 `config.rootDir` 后重装 bundle。
+默认库目录：`rootDir` 留空时是「Harness 默认工作目录 / notes」（也可以用环境变量 `DSH_NOTES_DIR` 指定）。改目录有两个入口：`设置 → 笔记 → 笔记库目录`（推荐，保存后插件自动重载并立即生效，写入 profile 覆盖层），或修改 `cordis.patch.yml` 的 `config.rootDir` 后重装 bundle。
 
 一篇笔记就是一个 Markdown 文件，可以直接用任何编辑器、git 或 Obsidian 打开：
 
@@ -58,13 +58,13 @@ starred: false
 ## 结构
 
 ```
-plugin/
-  index.js          Host 半：vault 读写、/api/dsh-note 路由、note_* 工具
-  client.js         Client 半：三栏界面、Markdown 渲染、会话沉淀按钮
-  package.json      bundle 清单（dsh.bundle.patch + dsh.client）
-  cordis.patch.yml  插入 dsh-note 插件行并配置 rootDir
-  locale/{zh,en}.json  插件管理器里显示的标题与描述
-  icon.svg          面板图标
+index.js          Host 半：vault 读写、/api/dsh-note 路由、note_* 工具
+client.js         Client 半：三栏界面、Markdown 渲染、会话沉淀按钮
+package.json      bundle 清单（dsh.bundle.patch + dsh.client）
+cordis.patch.yml  插入 dsh-note 插件行并配置 rootDir
+locale/{zh,en}.json  插件管理器里显示的标题与描述
+icon.svg          面板图标
+index.test.js / integration.test.js / sidebar.test.js  18 个测试
 ```
 
 - 页面 API：`POST /api/dsh-note`，基础 `action` 为 `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`。联动 action 为 `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`。设置页使用 `set-root`（通过 `configEditor` 写回 `rootDir`，先回包再让插件重载）。路由仅接受本机回环请求并做同源校验；`list` 返回 `folders` 以及笔记的 `sources` / `revision`，`saveAnswer` 追加时需要对应 `expectedRevision`。`create` 可传相对库目录的 `folder`；`createFolder` 接收 `name` 和可选 `parent`。
@@ -74,11 +74,17 @@ plugin/
 
 ## 安装 / 更新
 
-在 DSH 里用 `plugin_manager` 把 `plugin/` 目录装成 bundle（`install_bundle`）。因为装的是目录链接，改完代码后可在插件页停用再启用「笔记」以重新载入，必要时刷新页面；也可通过 `remove_bundle` + `install_bundle` 更新。
+从 GitHub 直接安装：
+
+```sh
+dsh plugin add github:SivanCola/dsh-note
+```
+
+也可以本地开发：在 DSH 里用 `plugin_manager` 把仓库目录装成 bundle（`install_bundle`）。因为装的是目录链接，改完代码后可在插件页停用再启用「笔记」以重新载入，必要时刷新页面；也可通过 `remove_bundle` + `install_bundle` 更新。
 
 ## 本地验证
 
-在 `plugin/` 目录运行 `npm run check` 检查语法，`npm test` 验证目录递归、嵌套笔记的读写 / 搜索 / 待办、根目录兼容、重名处理、路径边界、冷会话回答读取、重复保存、追加冲突、来源保留、引用快照、原生草稿插入调用、独立收藏 / 置顶、待办搜索和编辑器刷新 / 顺序保存。测试在临时目录执行，不修改实际笔记库。
+在仓库根运行 `npm run check` 检查语法，`npm test` 验证目录递归、嵌套笔记的读写 / 搜索 / 待办、根目录兼容、重名处理、路径边界、冷会话回答读取、重复保存、追加冲突、来源保留、引用快照、原生草稿插入调用、独立收藏 / 置顶、待办搜索和编辑器刷新 / 顺序保存。测试在临时目录执行，不修改实际笔记库。
 
 来源回答跳转会打开原会话并展示对应回答原文；当前 Harness 没有公开的聊天消息滚动定位接口，因此插件不自动滚动聊天时间线，也不通过 DOM 查询模拟定位。
 

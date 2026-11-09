@@ -6,7 +6,7 @@
  * half owns; this module only talks to it over /api/dsh-note.
  */
 window.__ModuleLoader__.load({
-  id: '@local/dsh-note',
+  id: '@sivancola/dsh-note',
   factory(require) {
     const React = require('react')
     const h = React.createElement

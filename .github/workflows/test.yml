@@ -19,7 +19,7 @@ jobs:
         node: ['22', '24']
     defaults:
       run:
-        working-directory: plugin
+        working-directory: .
     steps:
       - uses: actions/checkout@v5
 

@@ -27,7 +27,7 @@ The layout follows the Youdao Cloud Notes desktop app, but the data sits in your
 
 ## Where the data lives
 
-With `rootDir` empty the vault is `<Harness default working directory>/notes`; the `DSH_NOTES_DIR` environment variable also works. There are two ways to change it: `Settings → Notes → Vault directory` (recommended — the plugin reloads and applies it at once, persisted as a profile override), or edit `config.rootDir` in `plugin/cordis.patch.yml` and reinstall the bundle.
+With `rootDir` empty the vault is `<Harness default working directory>/notes`; the `DSH_NOTES_DIR` environment variable also works. There are two ways to change it: `Settings → Notes → Vault directory` (recommended — the plugin reloads and applies it at once, persisted as a profile override), or edit `config.rootDir` in `cordis.patch.yml` and reinstall the bundle.
 
 One note is one Markdown file, readable by any editor, git or Obsidian:
 
@@ -58,13 +58,13 @@ An old note with no source identity never guesses a link from its title; saving 
 ## Structure
 
 ```
-plugin/
-  index.js          Host half: vault I/O, /api/dsh-note routes, note_* tools
-  client.js         Client half: three-column UI, Markdown rendering, session action
-  package.json      bundle manifest (dsh.bundle.patch + dsh.client)
-  cordis.patch.yml  inserts the dsh-note row and configures rootDir
-  locale/{zh,en}.json  title and description shown in the plugin manager
-  icon.svg          panel icon
+index.js          Host half: vault I/O, /api/dsh-note routes, note_* tools
+client.js         Client half: three-column UI, Markdown rendering, session action
+package.json      bundle manifest (dsh.bundle.patch + dsh.client)
+cordis.patch.yml  inserts the dsh-note row and configures rootDir
+locale/{zh,en}.json  title and description shown in the plugin manager
+icon.svg          panel icon
+index.test.js / integration.test.js / sidebar.test.js  18 tests
 ```
 
 - HTTP API: `POST /api/dsh-note` with base actions `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`. Integration actions are `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`. The settings page uses `set-root` (persists `rootDir` through `configEditor`; it answers first and only then lets the plugin reload). Routes accept loopback requests only and check same-origin. `list` returns `folders` plus each note's `sources` / `revision`; appending with `saveAnswer` requires the matching `expectedRevision`. `create` accepts a vault-relative `folder`, and `createFolder` takes `name` plus an optional `parent`.
@@ -74,11 +74,17 @@ plugin/
 
 ## Install / update
 
-Install the `plugin/` directory as a bundle with `plugin_manager` (`install_bundle`) inside DSH. Because it is a directory link, after editing the code you can disable and re-enable "Notes" on the plugins page to reload it, refreshing the page when needed; `remove_bundle` + `install_bundle` also updates it.
+Install straight from GitHub:
+
+```sh
+dsh plugin add github:SivanCola/dsh-note
+```
+
+For local development, install the repository directory as a bundle with `plugin_manager` (`install_bundle`) inside DSH. Because it is a directory link, after editing the code you can disable and re-enable "Notes" on the plugins page to reload it, refreshing the page when needed; `remove_bundle` + `install_bundle` also updates it.
 
 ## Local verification
 
-In `plugin/`, `npm run check` verifies syntax and `npm test` covers folder recursion, nested note read/write/search/todos, root-level compatibility, duplicate titles, path boundaries, cold-session answer reads, duplicate saves, append conflicts, source retention, reference snapshots, native draft insertion calls, independent star/pin, todo search, and editor refresh plus ordered saving. Tests run in temporary directories and never touch a real vault.
+At the repository root, `npm run check` verifies syntax and `npm test` covers folder recursion, nested note read/write/search/todos, root-level compatibility, duplicate titles, path boundaries, cold-session answer reads, duplicate saves, append conflicts, source retention, reference snapshots, native draft insertion calls, independent star/pin, todo search, and editor refresh plus ordered saving. Tests run in temporary directories and never touch a real vault.
 
 Jumping back to a source answer opens the original session and shows the answer text; Harness currently exposes no public API for scrolling a chat message into view, so the plugin neither scrolls the timeline nor fakes it with DOM queries.
 
