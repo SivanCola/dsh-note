@@ -8,6 +8,18 @@ A local Markdown notebook that lives inside [DeepSeek Harness](https://github.co
 
 The layout follows the Youdao Cloud Notes desktop app, but the data sits in your own folder: no account, no cloud lock-in, and every note is a plain `.md` file you can open in any editor, commit with git, or point Obsidian at.
 
+## Screenshots
+
+Every shot below uses fictional sample notes (a release checklist, a weekly meeting note, a Kyoto trip plan, a reading note) — no real data.
+
+| Three-column vault | Split edit / preview |
+| --- | --- |
+| ![Three-column vault](assets/screenshots/vault.png) | ![Split edit and preview](assets/screenshots/split.png) |
+
+| Rendered body (tables, checkboxes, quotes) | Todo centre |
+| --- | --- |
+| ![Rendered note body](assets/screenshots/table.png) | ![Todo centre](assets/screenshots/todos.png) |
+
 ## What it does
 
 - **Folder-based vault**: a narrow filter rail, a folder tree, and the note body — the layout of the reference app. Titles render as single-line rows; click to open, expand or collapse folders, and the current note is tinted. The header carries search and a full-width New button; you can create a note inside the current folder, create a subfolder, and sort by title or by update time. The tree supports arrow keys, Home / End and Enter; the toolbar switches back to the summary list.
@@ -64,7 +76,8 @@ package.json      bundle manifest (dsh.bundle.patch + dsh.client)
 cordis.patch.yml  inserts the dsh-note row and configures rootDir
 locale/{zh,en}.json  title and description shown in the plugin manager
 icon.svg          panel icon
-index.test.js / integration.test.js / sidebar.test.js  18 tests
+screenshots.json  storefront screenshot list (assets/screenshots/*.png)
+index.test.js / integration.test.js / sidebar.test.js / markdown.test.js  22 tests
 ```
 
 - HTTP API: `POST /api/dsh-note` with base actions `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`. Integration actions are `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`. The settings page uses `set-root` (persists `rootDir` through `configEditor`; it answers first and only then lets the plugin reload). Routes accept loopback requests only and check same-origin. `list` returns `folders` plus each note's `sources` / `revision`; appending with `saveAnswer` requires the matching `expectedRevision`. `create` accepts a vault-relative `folder`, and `createFolder` takes `name` plus an optional `parent`.

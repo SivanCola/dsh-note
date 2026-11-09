@@ -8,6 +8,18 @@
 
 参考形态来自有道云笔记桌面端（见 `.refs/shot1.png`、`.refs/shot2.png`），但数据落在你自己的文件夹里，不锁在任何云服务中。
 
+## 截图
+
+下面几张用的是虚构的示例笔记（发布检查清单、周会纪要、京都四日、读书笔记），不含任何真实数据。
+
+| 三栏笔记库 | 分栏编辑 / 预览 |
+| --- | --- |
+| ![三栏笔记库](assets/screenshots/vault.png) | ![分栏编辑与预览](assets/screenshots/split.png) |
+
+| 正文渲染（表格 / 复选框 / 引用） | 待办中心 |
+| --- | --- |
+| ![正文渲染](assets/screenshots/table.png) | ![待办中心](assets/screenshots/todos.png) |
+
 ## 现在能做什么
 
 - **目录式笔记库**：参考本机有道云笔记的「窄导航 / 文件夹树 / 正文」布局。默认单行标题目录，单击打开，文件夹可展开收起；浅蓝色标记当前笔记。顶部搜索与整行新建按钮，支持在当前文件夹内新建笔记、创建子文件夹、按标题或更新时间排序。目录树支持方向键、Home / End、Enter 打开；工具栏可切换回摘要列表。
@@ -64,7 +76,8 @@ package.json      bundle 清单（dsh.bundle.patch + dsh.client）
 cordis.patch.yml  插入 dsh-note 插件行并配置 rootDir
 locale/{zh,en}.json  插件管理器里显示的标题与描述
 icon.svg          面板图标
-index.test.js / integration.test.js / sidebar.test.js  18 个测试
+screenshots.json  插件市场截图清单（assets/screenshots/*.png）
+index.test.js / integration.test.js / sidebar.test.js / markdown.test.js  22 个测试
 ```
 
 - 页面 API：`POST /api/dsh-note`，基础 `action` 为 `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`。联动 action 为 `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`。设置页使用 `set-root`（通过 `configEditor` 写回 `rootDir`，先回包再让插件重载）。路由仅接受本机回环请求并做同源校验；`list` 返回 `folders` 以及笔记的 `sources` / `revision`，`saveAnswer` 追加时需要对应 `expectedRevision`。`create` 可传相对库目录的 `folder`；`createFolder` 接收 `name` 和可选 `parent`。

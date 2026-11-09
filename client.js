@@ -303,6 +303,23 @@ window.__ModuleLoader__.load({
       let listOpen = false
       let listTag = 'ul'
 
+      const splitRow = (row) =>
+        row
+          .trim()
+          .replace(/^\|/, '')
+          .replace(/\|$/, '')
+          .split('|')
+          .map((cell) => cell.trim())
+
+      const alignOf = (cell) => {
+        const left = cell.startsWith(':')
+        const right = cell.endsWith(':')
+        if (left && right) return 'center'
+        if (right) return 'right'
+        if (left) return 'left'
+        return ''
+      }
+
       const closeList = () => {
         if (!listOpen) return
         out.push('</' + listTag + '>')
@@ -392,13 +409,42 @@ window.__ModuleLoader__.load({
           continue
         }
 
+        const isTableHead = line.includes('|') && index + 1 < lines.length && /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(lines[index + 1]) && lines[index + 1].includes('-')
+        if (isTableHead) {
+          closeList()
+          const header = splitRow(line)
+          const aligns = splitRow(lines[index + 1]).map(alignOf)
+          index += 2
+          const rows = []
+          while (index < lines.length && lines[index].includes('|') && !/^\s*$/.test(lines[index])) {
+            rows.push(splitRow(lines[index]))
+            index += 1
+          }
+          const th = header
+            .map((cell, column) => '<th' + (aligns[column] ? ' style="text-align:' + aligns[column] + '"' : '') + '>' + inline(cell) + '</th>')
+            .join('')
+          const body = rows
+            .map(
+              (row) =>
+                '<tr>' +
+                row
+                  .map((cell, column) => '<td' + (aligns[column] ? ' style="text-align:' + aligns[column] + '"' : '') + '>' + inline(cell) + '</td>')
+                  .join('') +
+                '</tr>',
+            )
+            .join('')
+          out.push('<table><thead><tr>' + th + '</tr></thead><tbody>' + body + '</tbody></table>')
+          continue
+        }
+
         closeList()
         const paragraph = [line]
         index += 1
         while (
           index < lines.length &&
           !/^\s*$/.test(lines[index]) &&
-          !/^(#{1,6}\s|```|\s*[-*]\s|\s*\d+\.\s|\s*>)/.test(lines[index])
+          !/^(#{1,6}\s|```|\s*[-*]\s|\s*\d+\.\s|\s*>)/.test(lines[index]) &&
+          !(lines[index].includes('|') && index + 1 < lines.length && lines[index + 1].includes('|') && /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(lines[index + 1]))
         ) {
           paragraph.push(lines[index])
           index += 1
@@ -537,6 +583,10 @@ window.__ModuleLoader__.load({
       .dn-preview ul,.dn-preview ol{margin:8px 0;padding-left:22px;}
       .dn-preview li{margin:3px 0;}
       .dn-preview blockquote{margin:10px 0;padding:6px 12px;border-left:3px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-1);border-radius:0 6px 6px 0;}
+      .dn-preview table{margin:10px 0;border-collapse:collapse;font-size:calc(var(--dn-fs,13px) * 0.962);}
+      .dn-preview th,.dn-preview td{border:1px solid var(--dsw-alias-border-l1);padding:5px 10px;text-align:left;}
+      .dn-preview th{background:var(--dsw-alias-bg-layer-2);font-weight:600;}
+      .dn-preview tbody tr:nth-child(even){background:var(--dsw-alias-bg-layer-1);}
       .dn-preview code{font-family:var(--ds-font-family-code,ui-monospace,SFMono-Regular,Menlo,monospace);font-size:calc(var(--dn-fs,13px) * 0.923);background:var(--dsw-alias-bg-layer-2);padding:1px 5px;border-radius:4px;}
       .dn-preview pre.dn-code{margin:10px 0;padding:10px 12px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:8px;overflow:auto;}
       .dn-preview pre.dn-code code{background:transparent;padding:0;font-size:calc(var(--dn-fs,13px) * 0.923);line-height:1.6;}
