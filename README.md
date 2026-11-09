@@ -1,5 +1,9 @@
 # dsh-note
 
+[English](README.en.md) · [简体中文](README.md)
+
+[![tests](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml/badge.svg)](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml)
+
 一个装在 DeepSeek Harness 里的本地 Markdown 笔记应用——三栏笔记库（导航 / 列表 / 编辑器）、双栏实时预览、标签与待办聚合，外加「把当前会话一键沉淀为笔记」。
 
 参考形态来自有道云笔记桌面端（见 `.refs/shot1.png`、`.refs/shot2.png`），但数据落在你自己的文件夹里，不锁在任何云服务中。
@@ -77,6 +81,8 @@ plugin/
 在 `plugin/` 目录运行 `npm run check` 检查语法，`npm test` 验证目录递归、嵌套笔记的读写 / 搜索 / 待办、根目录兼容、重名处理、路径边界、冷会话回答读取、重复保存、追加冲突、来源保留、引用快照、原生草稿插入调用、独立收藏 / 置顶、待办搜索和编辑器刷新 / 顺序保存。测试在临时目录执行，不修改实际笔记库。
 
 来源回答跳转会打开原会话并展示对应回答原文；当前 Harness 没有公开的聊天消息滚动定位接口，因此插件不自动滚动聊天时间线，也不通过 DOM 查询模拟定位。
+
+上述检查也在 GitHub Actions 里跑：`.github/workflows/test.yml` 在 Node 22 / 24 上执行 `npm run check` 与 `npm test`。
 
 ## 还没做的（下一步）
 
