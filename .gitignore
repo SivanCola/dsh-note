@@ -4,6 +4,9 @@ notes/
 # Reference screenshots and scratch material.
 .refs/
 
+# Playwright MCP scratch snapshots.
+.playwright-mcp/
+
 node_modules/
 .DS_Store
 *.log

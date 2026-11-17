@@ -1,47 +1,75 @@
+<div align="center">
+
+<img src="assets/icon-512.png" width="92" alt="dsh-note">
+
 # dsh-note
 
-[English](README.en.md) · [简体中文](README.md)
+**笔记留在自己的文件夹里，灵感留在对话旁边。**
 
-[![tests](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml/badge.svg)](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml)
+一个装在 [DeepSeek Harness](https://github.com/deepseek-ai) 里的本地 Markdown 笔记应用：可切换视图的笔记库、分栏实时预览、待办中心，以及「对话 ↔ 笔记」的双向流转。
 
-一个装在 DeepSeek Harness 里的本地 Markdown 笔记应用——三栏笔记库（导航 / 列表 / 编辑器）、双栏实时预览、标签与待办聚合，外加「把当前会话一键沉淀为笔记」。
+[![tests](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml/badge.svg)](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml) [![license](https://img.shields.io/badge/license-MIT-2f6f6b.svg)](LICENSE) [![node](https://img.shields.io/badge/node-22%20%7C%2024-2f6f6b.svg)](package.json) [![local-first](https://img.shields.io/badge/local--first-yes-b8432c.svg)](#数据与隐私)
 
-参考形态来自有道云笔记桌面端（见 `.refs/shot1.png`、`.refs/shot2.png`），但数据落在你自己的文件夹里，不锁在任何云服务中。
+[安装](#安装) · [功能详解](docs/features.md) · [English](README.en.md)
 
-## 截图
+</div>
 
-下面几张用的是虚构的示例笔记（发布检查清单、周会纪要、京都四日、读书笔记），不含任何真实数据。
+<p align="center">
+  <img src="assets/demo.gif" alt="演示：切换到分栏、输入 Markdown、实时预览、勾选待办并同步到待办中心" width="100%">
+</p>
 
-| 三栏笔记库 | 分栏编辑 / 预览 |
+<p align="center"><sub>示例数据均为虚构 · 不使用任何真实笔记</sub></p>
+
+## 为什么是 dsh-note
+
+**本地优先，不被锁定。** 没有账号、没有云端、没有遥测。一篇笔记就是一个 `.md` 文件，整个库就是一个文件夹——可以用 git 管、用 Obsidian 开、用任何编辑器改。卸载插件，笔记还在。
+
+**和对话长在一起。** 会话可以一键沉淀成笔记，回答可以存进笔记，笔记或选中的片段可以加入对话草稿，来源与关联可以双向跳转。不是把聊天记录复制出去，而是让它变成能被搜索和引用的长期记忆。
+
+**写、读、找一条龙。** 目录树、实时预览、全文搜索、标签、待办中心都在同一个面板里。不用在编辑器、文件管理器和聊天窗口之间来回切。
+
+## 界面预览
+
+| 笔记库与视图切换 | 分栏编辑 / 实时预览 |
 | --- | --- |
-| ![三栏笔记库](assets/screenshots/vault.png) | ![分栏编辑与预览](assets/screenshots/split.png) |
+| ![笔记库与列表头的视图菜单](assets/screenshots/vault.png) | ![分栏编辑与实时预览](assets/screenshots/split.png) |
 
-| 正文渲染（表格 / 复选框 / 引用） | 待办中心 |
+| 表格、复选框与引用 | 待办中心 |
 | --- | --- |
-| ![正文渲染](assets/screenshots/table.png) | ![待办中心](assets/screenshots/todos.png) |
+| ![表格、复选框与引用的渲染效果](assets/screenshots/table.png) | ![按完成状态筛选的待办中心](assets/screenshots/todos.png) |
 
-## 现在能做什么
+| 深色模式 | 设置 · 笔记 |
+| --- | --- |
+| ![跟随 Harness 主题的深色模式](assets/screenshots/dark.png) | ![笔记库目录、字号与统计设置](assets/screenshots/settings.png) |
 
-- **目录式笔记库**：参考本机有道云笔记的「窄导航 / 文件夹树 / 正文」布局。默认单行标题目录，单击打开，文件夹可展开收起；浅蓝色标记当前笔记。顶部搜索与整行新建按钮，支持在当前文件夹内新建笔记、创建子文件夹、按标题或更新时间排序。目录树支持方向键、Home / End、Enter 打开；工具栏可切换回摘要列表。
-- **筛选状态保持**：从最近、收藏、标签或搜索结果打开笔记会保留当前筛选；待办的来源跳转也保留待办页和关键词。从会话引用或关联笔记跳回时，会打开全部笔记并定位目标。
-- **收藏与置顶**：编辑器右上角的星标控制收藏，图钉控制置顶，两者独立保存。旧笔记的 `pinned` 仍只表示置顶，不自动转换为收藏。「最近」按更新时间选取最近 15 篇，不受置顶优先级影响。
-- **正文阅读与定位**：默认打开渲染后的正文，可切换编辑或分栏；顶部路径可定位所属文件夹。阅读模式、目录展开状态、排序和列表展示偏好在本机保留。
-- **Markdown 编辑 + 实时预览**：编辑 / 分栏 / 预览三种模式；工具栏支持加粗、斜体、行内代码、标题、列表、待办、引用、代码块、链接、表格。输入即自动保存（650ms 防抖），状态栏显示「已保存 hh:mm」。
-- **标签**：每篇笔记可加标签，标签页按出现次数聚合，点标签即筛选。
-- **待办中心**：把所有笔记里的 `- [ ]` 抽出来集中展示，可按任务文字、来源笔记标题或标签搜索；勾选后回写原文件，并同步更新当前打开的 Markdown 与预览。已完成项列在下方，搜索同时包含完成与未完成项。待办行带内容修订校验，笔记变化导致旧行失效时会刷新列表并提示重新勾选。
-- **全文搜索**：`⌘K` 聚焦搜索框，标题 + 正文即时过滤。
-- **会话沉淀**：任意会话标题栏右侧「存为笔记」，把当前会话的用户/助手对话整理成一篇带日期的笔记，自动打上「会话沉淀」标签。
-- **笔记加入对话**：笔记顶部「加入对话」可发送整篇快照，或选中编辑区 / 预览区的文字后只加入片段；可选现有对话或沿用 Harness 工作区流程打开新对话。内容通过 Harness 原生输入接口插入草稿，保留已有文字、引用和撤销历史，不自动发送。单次最多加入 12000 个 Unicode 字符，截断会明确提示。
-- **回答保存到笔记**：回答操作栏中的「保存回答到笔记」可新建笔记或追加到已有笔记，保存前预览原文。只读取持久助手消息中的文字，不保存思考或工具调用；同一来源重复保存会去重，追加前校验目标笔记版本。
-- **来源双向跳转**：笔记的「来源与关联」可返回来源会话并展示对应回答原文、轮次和时间；会话标题栏的「关联笔记」可反向打开笔记。发送后的笔记引用也可点击打开。来源写入 Markdown frontmatter 的 `dsh_sources`，改标题或重启后仍保留；“加入过此会话草稿”只表示草稿关联，不代表已经发送或执行。
-- **Agent 读写**：注册了 `note_list` / `note_search` / `note_read` / `note_write` 四个工具，于是「帮我找一下双十一活动的接口文档」这类话可以直接在笔记库里命中。
-- **设置分区**：`设置` 里新增「笔记」一页——显示当前库路径与统计（笔记 / 文件夹 / 标签 / 未完成待办），可直接改笔记库目录（保存后插件自动重载、立即生效），提供「字号」切换（小 / 标准 / 大 / 特大，立即生效、只影响本机），并给出「打开笔记面板」入口与快捷键说明。
+## 核心功能
 
-## 数据在哪
+| 写作 | 整理 | 连接 |
+| --- | --- | --- |
+| **笔记库与视图切换**<br>最近 / 全部笔记 / 收藏 / 标签 / 待办收进列表头的菜单；真实文件夹树、单行标题、面包屑；方向键与 Home / End 导航。 | **搜索、标签与收藏**<br>⌘K 全文搜索并高亮命中；标签按频次聚合；收藏与置顶独立保存。 | **会话沉淀**<br>把当前会话整理成带日期的笔记，自动打上「会话沉淀」标签。 |
+| **分栏实时预览**<br>Markdown 边写边渲染；分隔条可拖动，也支持键盘微调；比例自动记住。 | **待办中心**<br>聚合全库 `- [ ]`，显示进度、按状态筛选；勾选回写原文件。 | **来源与关联**<br>回答存进笔记；笔记加入对话；来源与关联双向跳转。 |
 
-默认库目录：`rootDir` 留空时是「Harness 默认工作目录 / notes」（也可以用环境变量 `DSH_NOTES_DIR` 指定）。改目录有两个入口：`设置 → 笔记 → 笔记库目录`（推荐，保存后插件自动重载并立即生效，写入 profile 覆盖层），或修改 `cordis.patch.yml` 的 `config.rootDir` 后重装 bundle。
+右侧栏里还有一张「工作区笔记」卡片：按当前会话的工作区文件夹收一份紧凑列表，点开就能读；需要编辑时再跳回完整面板。找不到对应文件夹时会给出空状态和「查看全部笔记」，不会把整库硬塞进窄栏。
 
-一篇笔记就是一个 Markdown 文件，可以直接用任何编辑器、git 或 Obsidian 打开：
+## 安装
+
+```sh
+dsh plugin add github:SivanCola/dsh-note
+```
+
+安装后在插件页确认「笔记」已启用，从侧栏打开笔记面板（列表 + 编辑器两栏），或在右侧栏打开「工作区笔记」。首次打开会在 Harness 的默认工作目录下创建 `notes/`。
+
+也可以把仓库目录装成本地 bundle 进行开发：在 DSH 里用 `plugin_manager` 的 `install_bundle`；因为装的是目录链接，改完代码后在插件页停用再启用「笔记」即可重新载入，必要时刷新页面。
+
+## 数据与隐私
+
+- 默认库目录是 `<Harness 默认工作目录>/notes`，也可以用环境变量 `DSH_NOTES_DIR`，或在 `设置 → 笔记` 里改目录（保存后插件自动重载）。
+- 一篇笔记一个 Markdown 文件，frontmatter 保存标题、标签、时间与来源；可以直接用 git 或 Obsidian 打开。
+- 界面偏好（字号、排序、阅读模式、分栏比例）只保存在本机 `localStorage`，不随库同步。
+- 插件只在本机读写文件；没有账号、云端同步或遥测。
+
+<details>
+<summary>一篇笔记长什么样？</summary>
 
 ```markdown
 ---
@@ -57,52 +85,29 @@ starred: false
 ...
 ```
 
-笔记 id 是相对库目录的文件路径（去掉 `.md`），例如 `工作/2026/接口评审`。原有根目录笔记 id 保持不变；改标题不会重命名文件。目录树对应磁盘上的真实子文件夹，不会自动按标题或标签移动现有笔记；不读取符号链接。
+笔记 id 是相对库目录的文件路径去掉 `.md`，例如 `工作/2026/接口评审`。目录树对应磁盘上的真实子文件夹；改标题不会重命名文件。
 
-界面偏好（字号、目录树/摘要、排序、默认阅读模式）保存在本机 `localStorage`，键前缀 `dsh-note:`，不随 vault 同步、也不跟随其他设备。
+</details>
 
-`dsh_sources` 是插件维护的 JSON 数组：回答来源包含 `sessionId` / `messageId` / `seq` / `turn` / `time`；笔记引用关联包含会话 id、笔记内容修订摘要、整篇或片段范围，以及 `draft` 状态。正文编辑会保留这些来源。原始会话被删除、笔记文件被移动或库目录改变时，跳转可能不可用，界面会明确报错。
+## 文档
 
-编辑器按顺序保存修改，保存期间继续输入的内容会在后续一次保存中提交。切换笔记或勾选待办前先等待当前修改保存；外部刷新只同步没有本地修改的正文。保存冲突会保留本地内容并显示错误，用户明确选择「重新载入」后才放弃未保存的内容。收藏与置顶的变更不改变正文修订，因此不会与正文编辑产生无关冲突。
+- [功能详解](docs/features.md)：每个功能的边界、数据格式、HTTP API、实现方式与验证方式
+- [English README](README.en.md)
+- [MIT License](LICENSE)
 
-旧笔记没有来源身份时不会根据标题猜测关联；重新保存回答或通过「加入对话」操作即可建立新的明确关联。
-
-## 结构
-
-```
-index.js          Host 半：vault 读写、/api/dsh-note 路由、note_* 工具
-client.js         Client 半：三栏界面、Markdown 渲染、会话沉淀按钮
-package.json      bundle 清单（dsh.bundle.patch + dsh.client）
-cordis.patch.yml  插入 dsh-note 插件行并配置 rootDir
-locale/{zh,en}.json  插件管理器里显示的标题与描述
-icon.svg          面板图标
-screenshots.json  插件市场截图清单（assets/screenshots/*.png）
-index.test.js / integration.test.js / sidebar.test.js / markdown.test.js  22 个测试
-```
-
-- 页面 API：`POST /api/dsh-note`，基础 `action` 为 `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`。联动 action 为 `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`。设置页使用 `set-root`（通过 `configEditor` 写回 `rootDir`，先回包再让插件重载）。路由仅接受本机回环请求并做同源校验；`list` 返回 `folders` 以及笔记的 `sources` / `revision`，`saveAnswer` 追加时需要对应 `expectedRevision`。`create` 可传相对库目录的 `folder`；`createFolder` 接收 `name` 和可选 `parent`。
-- Host 依赖：`tools`、`webServer`；不声明第三方 npm 依赖，零构建。
-- 会话来源读取复用 Harness 的 `sessionQuery.readSession/readSurface`，因此可以读取已持久化的冷会话；回答保存需要启用该服务。整个会话导出在服务缺失时仍可读取实时会话。
-- Client 复用 `sessions` / `uiSession` 管理会话生命周期与输入标准属性，复用 `uiWorkspace` 导航和工作区新会话准备流程；通过 `inputActions.captureInsertion/insertText/persistDraft` 插入草稿，通过 `uiConversation.userText` 渲染笔记引用。界面入口注册在 Harness 的回答操作、会话标题操作和 `shell.overlay` 插槽；插件卸载会释放注册。普通背景、文字和边框跟随 Harness 明暗主题，强调色为参考有道的蓝色。
-
-## 安装 / 更新
-
-从 GitHub 直接安装：
+## 开发
 
 ```sh
-dsh plugin add github:SivanCola/dsh-note
+npm run check   # 语法检查
+npm test        # 22 个测试
 ```
 
-也可以本地开发：在 DSH 里用 `plugin_manager` 把仓库目录装成 bundle（`install_bundle`）。因为装的是目录链接，改完代码后可在插件页停用再启用「笔记」以重新载入，必要时刷新页面；也可通过 `remove_bundle` + `install_bundle` 更新。
+零构建、零第三方运行时依赖。测试在临时目录执行，不会修改真实笔记库；GitHub Actions 在 Node 22 / 24 上运行同样的检查。
 
-## 本地验证
+## 路线图
 
-在仓库根运行 `npm run check` 检查语法，`npm test` 验证目录递归、嵌套笔记的读写 / 搜索 / 待办、根目录兼容、重名处理、路径边界、冷会话回答读取、重复保存、追加冲突、来源保留、引用快照、原生草稿插入调用、独立收藏 / 置顶、待办搜索和编辑器刷新 / 顺序保存。测试在临时目录执行，不修改实际笔记库。
+`[[双链]]` 与知识库、文件夹移动 / 重命名、网页剪藏、AI 摘要与续写、有道云笔记同步、每日日记模板。
 
-来源回答跳转会打开原会话并展示对应回答原文；当前 Harness 没有公开的聊天消息滚动定位接口，因此插件不自动滚动聊天时间线，也不通过 DOM 查询模拟定位。
+---
 
-上述检查也在 GitHub Actions 里跑：`.github/workflows/test.yml` 在 Node 22 / 24 上执行 `npm run check` 与 `npm test`。
-
-## 还没做的（下一步）
-
-双链 `[[ ]]`、知识库、文件夹移动 / 重命名、网页剪藏、AI 摘要与续写、有道云笔记同步（本机已有 `youdaonote` CLI 可复用）、每日日记模板。
+<sub>界面预览与动图按插件真实样式渲染，示例笔记均为虚构。</sub>

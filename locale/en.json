@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Notes",
-    "description": "Local Markdown notes with a three-column vault, split preview, tags, todos, and one-click session-to-note deposit."
+    "description": "Local Markdown notes with a switchable vault view, split preview, tags, todos, and one-click session-to-note deposit."
   },
   "panel": {
     "label": "Notes"

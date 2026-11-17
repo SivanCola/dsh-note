@@ -1,47 +1,75 @@
+<div align="center">
+
+<img src="assets/icon-512.png" width="92" alt="dsh-note">
+
 # dsh-note
 
-[English](README.en.md) · [简体中文](README.md)
+**Your notes stay in your folder. Your thinking stays beside the conversation.**
 
-[![tests](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml/badge.svg)](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml)
+A local-first Markdown notebook inside [DeepSeek Harness](https://github.com/deepseek-ai): a switchable vault view, split live preview, an aggregated todo centre, and a two-way bridge between conversations and notes.
 
-A local Markdown notebook that lives inside [DeepSeek Harness](https://github.com/deepseek-ai): a three-column vault (navigation / list / editor), split live preview, tags, an aggregated todo center — plus one-click "turn this session into a note".
+[![tests](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml/badge.svg)](https://github.com/SivanCola/dsh-note/actions/workflows/test.yml) [![license](https://img.shields.io/badge/license-MIT-2f6f6b.svg)](LICENSE) [![node](https://img.shields.io/badge/node-22%20%7C%2024-2f6f6b.svg)](package.json) [![local-first](https://img.shields.io/badge/local--first-yes-b8432c.svg)](#data--privacy)
 
-The layout follows the Youdao Cloud Notes desktop app, but the data sits in your own folder: no account, no cloud lock-in, and every note is a plain `.md` file you can open in any editor, commit with git, or point Obsidian at.
+[Install](#install) · [Features](docs/features.en.md) · [简体中文](README.md)
+
+</div>
+
+<p align="center">
+  <img src="assets/demo.gif" alt="Demo: switch to split view, type Markdown, watch the preview update, tick a todo and see it sync to the todo centre" width="100%">
+</p>
+
+<p align="center"><sub>Fictional sample notes only · no real data</sub></p>
+
+## Why dsh-note
+
+**Local-first, not locked in.** No account, no cloud, no telemetry. One note is one `.md` file; the vault is a folder you can keep in git, open in Obsidian, or edit in any editor. Uninstall the plugin and the notes are still there.
+
+**Grows with the conversation.** Deposit a session as a dated note, save an assistant answer into a note, insert a note or a selection into the draft, and follow sources in both directions. It is not a copy of the chat log — it is long-term memory you can search and cite.
+
+**Write, read, find.** Folder tree, live preview, full-text search, tags and a todo centre live in one panel. No jumping between an editor, a file manager and the chat window.
 
 ## Screenshots
 
-Every shot below uses fictional sample notes (a release checklist, a weekly meeting note, a Kyoto trip plan, a reading note) — no real data.
-
-| Three-column vault | Split edit / preview |
+| Vault and view switcher | Split edit / live preview |
 | --- | --- |
-| ![Three-column vault](assets/screenshots/vault.png) | ![Split edit and preview](assets/screenshots/split.png) |
+| ![Vault with the view menu in the list header](assets/screenshots/vault.png) | ![Split edit and live preview](assets/screenshots/split.png) |
 
-| Rendered body (tables, checkboxes, quotes) | Todo centre |
+| Tables, checkboxes and quotes | Todo centre |
 | --- | --- |
-| ![Rendered note body](assets/screenshots/table.png) | ![Todo centre](assets/screenshots/todos.png) |
+| ![Rendered tables, checkboxes and quotes](assets/screenshots/table.png) | ![Todo centre filtered by completion state](assets/screenshots/todos.png) |
 
-## What it does
+| Dark mode | Settings · Notes |
+| --- | --- |
+| ![Dark mode following the Harness theme](assets/screenshots/dark.png) | ![Vault directory, text size and statistics](assets/screenshots/settings.png) |
 
-- **Folder-based vault**: a narrow filter rail, a folder tree, and the note body — the layout of the reference app. Titles render as single-line rows; click to open, expand or collapse folders, and the current note is tinted. The header carries search and a full-width New button; you can create a note inside the current folder, create a subfolder, and sort by title or by update time. The tree supports arrow keys, Home / End and Enter; the toolbar switches back to the summary list.
-- **Filter state is preserved**: opening a note from Recent, Starred, a tag or a search keeps that filter; jumping from a todo keeps the todo view and its keyword. Coming back from a conversation reference or a related note opens All notes and reveals the target.
-- **Stars and pins**: the star in the editor header controls favorites and the pin controls pinning; the two are stored independently. Legacy `pinned: true` still means "pinned only" and is never converted into a favorite. Recent picks the 15 most recently updated notes and ignores pin priority.
-- **Reading and locating**: a note opens as rendered body by default; switch to edit or split. The breadcrumb locates the owning folder. Reading mode, expanded folders, sort and list layout are remembered on this machine.
-- **Markdown editing + live preview**: edit / split / preview modes; the toolbar offers bold, italic, inline code, heading, list, task, quote, code block, link and table. Typing saves automatically (650 ms debounce) and the status line shows "Saved hh:mm".
-- **Tags**: every note can carry tags; the tag view aggregates them by frequency and one click filters.
-- **Todo center**: every `- [ ]` across the vault is collected in one place, searchable by task text, source note title or tag; ticking one writes back to the file and updates the open Markdown and preview. Completed items are listed below, and search covers both states. Each row carries a content revision check, so when a note changed underneath an old row the list refreshes and asks you to tick again.
-- **Full-text search**: `⌘K` focuses the search box and filters on title + body as you type.
-- **Session deposit**: "Save as note" in any session header turns the user/assistant conversation into a dated note tagged `会话沉淀`.
-- **Add a note to the conversation**: "Add to conversation" at the top of a note inserts the whole note, or just the text selected in the editor / preview. Content can go to an existing conversation or open a new one through Harness's workspace flow. Text is inserted through Harness's native input path, so existing draft text, quotes and undo history survive, and nothing is sent automatically. One insert is capped at 12,000 Unicode characters and truncation is called out.
-- **Save an answer to a note**: "Save answer to note" in the assistant action row creates a note or appends to an existing one, with a preview before saving. Only text from the durable assistant message is read — no reasoning, no tool calls. Saving the same source twice de-duplicates, and appending checks the target note revision first.
-- **Two-way source links**: "Sources & links" on a note goes back to the originating conversation and shows the exact answer, turn and time; "Related notes" in the session header opens the notes in reverse. Note references inside sent messages are clickable too. Sources are stored in frontmatter `dsh_sources`, so they survive renames and restarts; "added to this session draft" only means a draft link, not that it was sent or executed.
-- **Agent access**: four tools — `note_list` / `note_search` / `note_read` / `note_write` — so "find the API doc for the Double 11 campaign" can hit the vault directly.
-- **Settings page**: `Settings → Notes` shows the vault path and counts (notes / folders / tags / open todos), lets you change the vault directory (the plugin reloads and switches immediately), offers text size (Small / Default / Large / XL — applied instantly, local to this machine), and provides "Open the notes panel" plus the shortcut reminder.
+## Core features
 
-## Where the data lives
+| Write | Organise | Connect |
+| --- | --- | --- |
+| **Vault and view switcher**<br>Recent / All notes / Starred / Tags / Todos live in the list-header menu; real folder tree, single-line titles, breadcrumbs; arrow keys and Home / End. | **Search, tags and favourites**<br>⌘K full-text search with highlights; tags grouped by frequency; favourites and pins stored separately. | **Session deposit**<br>Turn the current session into a dated note tagged `会话沉淀`. |
+| **Split live preview**<br>Markdown renders as you type; drag the divider or nudge it with the keyboard; the ratio is remembered. | **Todo centre**<br>Every `- [ ]` in the vault with progress and status filters; ticking writes back to the file. | **Sources and links**<br>Save an answer into a note; add a note to a conversation; jump both ways. |
 
-With `rootDir` empty the vault is `<Harness default working directory>/notes`; the `DSH_NOTES_DIR` environment variable also works. There are two ways to change it: `Settings → Notes → Vault directory` (recommended — the plugin reloads and applies it at once, persisted as a profile override), or edit `config.rootDir` in `cordis.patch.yml` and reinstall the bundle.
+The right sidebar also carries a **Workspace notes** card: a compact list scoped to the current workspace folder, with reading in place and a jump back to the full panel when you want to edit. When the folder is absent, the empty state offers All notes instead of forcing the whole vault into a narrow pane.
 
-One note is one Markdown file, readable by any editor, git or Obsidian:
+## Install
+
+```sh
+dsh plugin add github:SivanCola/dsh-note
+```
+
+After installing, confirm that "Notes" is enabled on the plugins page and open the notes panel (a list and an editor in two panes) from the sidebar, or open **Workspace notes** from the right sidebar. The first open creates `notes/` under Harness's default working directory.
+
+For local development, install the repository directory as a bundle with `plugin_manager` (`install_bundle`). Because it is a directory link, disable and re-enable "Notes" on the plugins page to reload after editing, refreshing the page if needed.
+
+## Data & privacy
+
+- The default vault is `<Harness default working directory>/notes`. Override it with `DSH_NOTES_DIR` or `Settings → Notes` (the plugin reloads and applies the new directory immediately).
+- One note is one Markdown file. Frontmatter stores the title, tags, timestamps and sources. Open it with git, Obsidian or any editor.
+- UI preferences (text size, sort, reading mode, split ratio) live in this machine's `localStorage`; they do not travel with the vault.
+- The plugin only reads and writes local files. No account, cloud sync or telemetry.
+
+<details>
+<summary>What does a note look like?</summary>
 
 ```markdown
 ---
@@ -57,50 +85,29 @@ starred: false
 ...
 ```
 
-A note id is its path relative to the vault, without `.md` — for example `work/2026/api-review`. Existing root-level ids stay stable, and renaming the title never renames the file. The tree mirrors real folders on disk: nothing is moved automatically by title or tag, and symlinks are not followed.
+A note id is its path relative to the vault, without `.md`, for example `work/2026/api-review`. The tree mirrors real folders on disk; renaming the title never renames the file.
 
-UI preferences (text size, tree vs. summary, sort, default reading mode) live in this machine's `localStorage` under the `dsh-note:` prefix. They do not travel with the vault or to other devices.
+</details>
 
-`dsh_sources` is a JSON array the plugin owns: answer sources carry `sessionId` / `messageId` / `seq` / `turn` / `time`; note-reference links carry the session id, a revision digest of the note content, the whole-note or fragment range, and a `draft` flag. Editing the body keeps these sources. If the original session is deleted, or the note file or vault directory moves, a jump can fail — the UI says so explicitly.
+## Docs
 
-The editor saves changes in order: text typed while a save is in flight is submitted in the next one. Switching notes or ticking a todo waits for the pending save first. An external refresh only syncs bodies with no local edits. A save conflict keeps the local text and shows an error; only an explicit "Reload" discards unsaved work. Star and pin changes do not bump the body revision, so they never conflict with editing.
+- [Feature guide](docs/features.en.md): behaviour and limits, data format, HTTP API, implementation and verification
+- [简体中文 README](README.md)
+- [MIT License](LICENSE)
 
-An old note with no source identity never guesses a link from its title; saving an answer again or using "Add to conversation" establishes an explicit one.
-
-## Structure
-
-```
-index.js          Host half: vault I/O, /api/dsh-note routes, note_* tools
-client.js         Client half: three-column UI, Markdown rendering, session action
-package.json      bundle manifest (dsh.bundle.patch + dsh.client)
-cordis.patch.yml  inserts the dsh-note row and configures rootDir
-locale/{zh,en}.json  title and description shown in the plugin manager
-icon.svg          panel icon
-screenshots.json  storefront screenshot list (assets/screenshots/*.png)
-index.test.js / integration.test.js / sidebar.test.js / markdown.test.js  22 tests
-```
-
-- HTTP API: `POST /api/dsh-note` with base actions `list` / `get` / `create` / `createFolder` / `save` / `delete` / `search` / `todo` / `deposit`. Integration actions are `answer` / `saveAnswer` / `links` / `prepareReference` / `recordReference`. The settings page uses `set-root` (persists `rootDir` through `configEditor`; it answers first and only then lets the plugin reload). Routes accept loopback requests only and check same-origin. `list` returns `folders` plus each note's `sources` / `revision`; appending with `saveAnswer` requires the matching `expectedRevision`. `create` accepts a vault-relative `folder`, and `createFolder` takes `name` plus an optional `parent`.
-- Host dependencies: `tools`, `webServer`. No third-party npm dependencies, no build step.
-- Session sources are read through Harness's `sessionQuery.readSession/readSurface`, so persisted cold sessions work; saving an answer requires that service. Whole-session deposit still reads the live session when the service is absent.
-- The Client reuses `sessions` / `uiSession` for session lifetime and standard input props, `uiWorkspace` for navigation and new-session preparation, `inputActions.captureInsertion/insertText/persistDraft` to insert drafts, and `uiConversation.userText` to render note references. Entry points register on Harness's assistant actions, session header actions and the `shell.overlay` slot; unloading the plugin releases them. Backgrounds, text and borders follow the Harness light/dark theme, with a blue accent borrowed from the reference app.
-
-## Install / update
-
-Install straight from GitHub:
+## Development
 
 ```sh
-dsh plugin add github:SivanCola/dsh-note
+npm run check   # syntax check
+npm test        # 22 tests
 ```
 
-For local development, install the repository directory as a bundle with `plugin_manager` (`install_bundle`) inside DSH. Because it is a directory link, after editing the code you can disable and re-enable "Notes" on the plugins page to reload it, refreshing the page when needed; `remove_bundle` + `install_bundle` also updates it.
-
-## Local verification
-
-At the repository root, `npm run check` verifies syntax and `npm test` covers folder recursion, nested note read/write/search/todos, root-level compatibility, duplicate titles, path boundaries, cold-session answer reads, duplicate saves, append conflicts, source retention, reference snapshots, native draft insertion calls, independent star/pin, todo search, and editor refresh plus ordered saving. Tests run in temporary directories and never touch a real vault.
-
-Jumping back to a source answer opens the original session and shows the answer text; Harness currently exposes no public API for scrolling a chat message into view, so the plugin neither scrolls the timeline nor fakes it with DOM queries.
+No build step and no third-party runtime dependencies. Tests run in temporary directories and never touch a real vault; GitHub Actions runs the same checks on Node 22 / 24.
 
 ## Roadmap
 
-`[[wiki links]]`, a knowledge base, moving/renaming folders, web clipping, AI summaries and continuation, Youdao Cloud Notes sync (the `youdaonote` CLI is a candidate), and daily-journal templates.
+`[[wiki links]]` and a knowledge base, moving / renaming folders, web clipping, AI summaries and continuation, Youdao Cloud Notes sync, daily-journal templates.
+
+---
+
+<sub>Screenshots and the demo use the plugin's real stylesheet with fictional sample notes; no real data is shown.</sub>

@@ -16,7 +16,7 @@
     "markdown",
     "local-first"
   ],
-  "description": "Local Markdown notes panel for the DeepSeek Harness Web UI: three-column vault, split Markdown preview, todos, tags, and one-click session-to-note deposit.",
+  "description": "Local Markdown notes panel for the DeepSeek Harness Web UI: a switchable vault view, split Markdown preview, todos, tags, and one-click session-to-note deposit.",
   "type": "module",
   "scripts": {
     "test": "node --test",
@@ -35,7 +35,10 @@
     "locale/*.json",
     "icon.svg",
     "screenshots.json",
-    "assets/screenshots/*.png"
+    "assets/*.png",
+    "assets/demo.gif",
+    "assets/screenshots/*.png",
+    "docs/*.md"
   ],
   "dsh": {
     "bundle": {
