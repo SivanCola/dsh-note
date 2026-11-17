@@ -119,13 +119,13 @@ test('whole-session deposit also retains a source and works with cold session qu
   assert.ok(!result.note.content.includes('PRIVATE REASONING'))
 })
 
-test('bridge uses guarded native insertion, persists drafts and never submits a prompt', async () => {
+test('bridge inserts a note chip, persists drafts and never submits a prompt', async () => {
   const source = await readFile(new URL('./client.js', import.meta.url), 'utf8')
   const definition = source.slice(source.indexOf('    function createIntegrationBridge('), source.indexOf('    function useBridge('))
   const calls = []
   const input = {
     captureInsertion() { calls.push('capture'); return { start: 0, end: 5, draftRev: 1 } },
-    insertText(text, span) { calls.push(['insert', text, span]); return true },
+    insertQuote(text, summary) { calls.push(['quote', text, summary]); return true },
     persistDraft() { calls.push('persist') },
     submit() { throw new Error('must not send') },
     setDraft() { throw new Error('must not overwrite') },
@@ -157,15 +157,17 @@ test('bridge uses guarded native insertion, persists drafts and never submits a 
   assert.equal(bridge.getSnapshot().openRequest, 1)
   const prepared = { prompt: 'snapshot', note: { id: 'note' }, referenceId: 'ref', revision: 'revision', scope: 'full' }
   await bridge.addReference('current', prepared)
-  assert.ok(calls.includes('capture'))
+  const quoted = calls.find((call) => Array.isArray(call) && call[0] === 'quote')
+  assert.equal(quoted[1], 'snapshot', 'the payload rides inside the chip')
+  assert.equal(quoted[2].label, 'insert.chipLabel', 'the chip names itself as a note')
+  assert.equal(quoted[2].title, 'note')
   assert.ok(calls.includes('persist'))
-  assert.equal(calls.find((call) => Array.isArray(call) && call[0] === 'insert')[2].start, 5)
   assert.ok(calls.some((call) => Array.isArray(call) && call[0] === 'open' && call[1] === 'current'))
   await bridge.addReference('new', prepared)
   assert.ok(calls.some((call) => Array.isArray(call) && call[0] === 'workspace' && call[1] === 'project'))
   assert.ok(!calls.some((call) => Array.isArray(call) && call[0] === 'create'))
   assert.ok(calls.includes('release'))
-  input.insertText = () => false
+  input.insertQuote = () => false
   const start = calls.length
   await assert.rejects(() => bridge.addReference('current', prepared), /link.blocked/)
   assert.ok(!calls.slice(start).some((call) => Array.isArray(call) && call[0] === 'api'))

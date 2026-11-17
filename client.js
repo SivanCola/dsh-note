@@ -65,11 +65,14 @@ window.__ModuleLoader__.load({
       'page.newInFolder': '在此文件夹新建笔记',
       'page.folderError': '创建失败，名称可能已存在',
       'link.join': '加入对话',
-      'link.saveAnswer': '保存回答到笔记',
+      'link.saveAnswer': '存为笔记 · 这条回答',
+      'link.saveTitle': '存为笔记',
       'link.related': '关联笔记',
+      'link.relatedScope': '关联笔记 · 本会话引用的笔记',
       'link.sources': '来源与关联',
       'link.source': '来源回答',
       'link.openNote': '打开笔记',
+      'link.openSaved': '打开刚存的笔记',
       'link.current': '当前对话',
       'link.newSession': '新建对话（当前工作区）',
       'link.draftHint': '内容会加入对话草稿，保留已有草稿和引用，由你发送。',
@@ -138,6 +141,18 @@ window.__ModuleLoader__.load({
       'right.newNote': '新建笔记',
       'right.untitled': '未命名笔记',
       'right.openPanel': '在完整面板打开',
+      'right.edit': '在完整面板中编辑',
+      'insert.button': '插入笔记',
+      'insert.chipLabel': '笔记',
+      'insert.title': '插入笔记到对话',
+      'insert.hint': '选一篇或几篇笔记加入当前对话草稿：只插入此刻的快照，不会自动发送。',
+      'insert.search': '搜索笔记…',
+      'insert.empty': '没有匹配的笔记',
+      'insert.confirm': (n) => `插入 ${n} 篇`,
+      'insert.scope': '插入范围',
+      'insert.scopeFull': '整篇笔记',
+      'insert.scopeSelection': '选中片段',
+      'insert.noSelection': '先在笔记正文里选中一段文字，再点这枚按钮，就能只带那一段。',
       'right.back': '返回列表',
       'right.updated': (day) => `更新于 ${day}`,
       'right.showAll': '查看全部笔记',
@@ -158,6 +173,7 @@ window.__ModuleLoader__.load({
       'page.dirty': '未保存',
       'page.saveFailed': '保存失败',
       'page.deposit': '存为笔记',
+      'page.depositScope': '存为笔记 · 整段会话',
       'page.depositing': '保存中…',
       'page.deposited': '已沉淀为笔记',
       'page.depositFailed': '沉淀失败',
@@ -228,11 +244,14 @@ window.__ModuleLoader__.load({
       'page.newInFolder': 'New note in this folder',
       'page.folderError': 'Could not create folder; the name may already exist',
       'link.join': 'Add to chat',
-      'link.saveAnswer': 'Save answer to note',
+      'link.saveAnswer': 'Save as note · this answer',
+      'link.saveTitle': 'Save as note',
       'link.related': 'Linked notes',
+      'link.relatedScope': 'Linked notes · cited in this chat',
       'link.sources': 'Sources and links',
       'link.source': 'Source answer',
       'link.openNote': 'Open note',
+      'link.openSaved': 'Open the saved note',
       'link.current': 'Current chat',
       'link.newSession': 'New chat (current workspace)',
       'link.draftHint': 'Add this snapshot to the draft, preserving existing text and references. You choose when to send.',
@@ -301,6 +320,18 @@ window.__ModuleLoader__.load({
       'right.newNote': 'New note',
       'right.untitled': 'Untitled note',
       'right.openPanel': 'Open in full panel',
+      'right.edit': 'Edit in full panel',
+      'insert.button': 'Insert notes',
+      'insert.chipLabel': 'Note',
+      'insert.title': 'Insert notes into the chat',
+      'insert.hint': 'Add one or more notes to the draft. Only this snapshot goes in, and nothing is sent for you.',
+      'insert.search': 'Search notes…',
+      'insert.empty': 'No matching notes',
+      'insert.confirm': (n) => `Insert ${n}`,
+      'insert.scope': 'What to insert',
+      'insert.scopeFull': 'Whole notes',
+      'insert.scopeSelection': 'Selected passage',
+      'insert.noSelection': 'Select a passage in a note first, then use this button to carry just that text over.',
       'right.back': 'Back to list',
       'right.updated': (day) => `Updated ${day}`,
       'right.showAll': 'Show all notes',
@@ -321,6 +352,7 @@ window.__ModuleLoader__.load({
       'page.dirty': 'Unsaved',
       'page.saveFailed': 'Save failed',
       'page.deposit': 'Save as note',
+      'page.depositScope': 'Save as note · whole chat',
       'page.depositing': 'Saving…',
       'page.deposited': 'Saved as note',
       'page.depositFailed': 'Failed',
@@ -583,7 +615,7 @@ window.__ModuleLoader__.load({
          Warm paper surfaces over the Harness theme, ink text, a teal brush
          accent, and a vermillion seal kept for favourites and pins. Every
          colour derives from the host tokens, so light and dark both follow. */
-      .dn-page,.dn-set,.dn-modal-shade,.dn-hdrbtn,.dn-answer-action,.dn-link,.dn-right{
+      .dn-page,.dn-set,.dn-modal-shade,.dn-hdrbtn,.dn-answer-action,.dn-link,.dn-right,.dn-composer-action{
         --dn-ink:var(--dsw-alias-label-primary);
         --dn-ink-2:var(--dsw-alias-label-secondary);
         --dn-paper:color-mix(in srgb,var(--dsw-alias-bg-base) 96%,#c9a06a);
@@ -889,9 +921,33 @@ window.__ModuleLoader__.load({
 
       /* --------------------------------------------------------- header pills */
       .dn-hdrbtn{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--dn-line);background:transparent;color:var(--dn-ink-2);font-size:var(--dn-fs-2xs);cursor:pointer;white-space:nowrap;transition:background var(--dn-ease),color var(--dn-ease),border-color var(--dn-ease);}
-      .dn-hdrbtn:hover{background:var(--dn-paper-3);color:var(--dn-ink);border-color:transparent;}
+      .dn-hdrbtn:hover{background:var(--dsw-alias-interactive-bg-hover,var(--dn-paper-3));color:var(--dsw-alias-label-primary,var(--dn-ink));border-color:transparent;}
       .dn-hdrbtn.ok{color:var(--dsw-alias-state-success-primary);border-color:color-mix(in srgb,var(--dsw-alias-state-success-primary) 45%,transparent);}
       .dn-hdrbtn.err{color:var(--dsw-alias-state-error-primary);border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary) 45%,transparent);}
+      /* Icon-only header buttons copy the host's own utilities: no border at rest,
+         a 28px box with an 8px hover chip, secondary ink going primary on hover,
+         and the notes teal kept out of the header entirely. Emphasis between the
+         two is ink weight, not a second colour system. */
+      .dn-hdrbtn.icon{width:28px;padding:0;justify-content:center;border-color:transparent;border-radius:var(--dsw-radius-sm,8px);color:var(--dsw-alias-label-secondary,var(--dn-ink-2));}
+      .dn-hdrbtn.icon.lead{color:var(--dsw-alias-label-primary,var(--dn-ink));}
+      /* --dsw-alias-bg-layer-2 resolves to pure #fff in the light palette, so an
+         icon chip painted with it is invisible on the header. The host's own
+         utilities hover with the translucent interactive token instead. */
+      .dn-hdrbtn.icon:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(38,48,72,.06));color:var(--dsw-alias-label-primary,var(--dn-ink));}
+      .dn-hdrbtn.icon:active{background:var(--dsw-alias-interactive-bg-active,rgba(38,48,72,.1));}
+      .dn-hdrbtn.icon.ok{background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 16%,transparent);color:var(--dsw-alias-state-success-primary);}
+      .dn-hdrbtn.icon.err{background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 16%,transparent);color:var(--dsw-alias-state-error-primary);}
+      .dn-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+      /* Composer entry: same hit area and hover chip as the host's own tool row. */
+      .dn-composer-action{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:1px solid transparent;border-radius:var(--dsw-radius-sm,8px);background:transparent;color:var(--dsw-alias-label-secondary,var(--dn-ink-2));cursor:pointer;transition:background var(--dn-ease),color var(--dn-ease);}
+      .dn-composer-action:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(38,48,72,.06));color:var(--dsw-alias-label-primary,var(--dn-ink));}
+      .dn-scope{display:flex;gap:6px;flex-wrap:wrap;}
+      .dn-scope-btn{flex:none;padding:3px 11px;border:1px solid var(--dn-line);border-radius:999px;background:transparent;color:var(--dn-ink-2);font-size:var(--dn-fs-2xs);line-height:1.7;cursor:pointer;transition:background var(--dn-ease),color var(--dn-ease),border-color var(--dn-ease);}
+      .dn-scope-btn:hover{border-color:var(--dn-accent);color:var(--dn-accent);}
+      .dn-scope-btn.on{border-color:transparent;background:var(--dn-accent-soft);color:var(--dn-accent);font-weight:600;}
+      .dn-scope-btn:disabled{opacity:.45;cursor:default;}
+      .dn-scope-btn:disabled:hover{border-color:var(--dn-line);color:var(--dn-ink-2);}
+      .dn-scope-preview{margin:0;padding:8px 10px;border:1px solid var(--dn-line);border-radius:var(--dn-r-md);background:var(--dn-paper-2);color:var(--dn-ink-2);font-size:var(--dn-fs-2xs);line-height:1.6;max-height:170px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;}
 
       /* -------------------------------------------------------------- settings */
       .dn-set{display:flex;flex-direction:column;padding:4px 0 24px;max-width:760px;container-type:inline-size;}
@@ -1058,7 +1114,13 @@ window.__ModuleLoader__.load({
       trash: (size) => svg(['M4 7h16', 'M9 7V4h6v3', 'M6 7l1 14h10l1-14'], size),
       copy: (size) => svg(['M9 9h10v12H9z', 'M5 3h10v2', 'M5 3v12h2'], size),
       check: (size) => svg(['M4 12l5 5L20 6'], size),
-      deposit: (size) => svg(['M6 3h9l4 4v14H6z', 'M12 10v7', 'M9 14l3 3 3-3'], size),
+      /* The two note actions take verb glyphs, not objects: writing a note (page +
+         plus) versus linking to one (chain). Sharing the page silhouette with
+         ICONS.note at 14px made the header pair read as one icon twice. */
+      deposit: (size) => svg(['M6 3h9l4 4v14H6z', 'M15 3v4h4', 'M12.5 11.5v5', 'M10 14h5'], size),
+      relate: (size) => svg(['M10.5 13.5a4 4 0 0 0 5.7 0l2-2a4 4 0 0 0-5.7-5.7l-1 1', 'M13.5 10.5a4 4 0 0 0-5.7 0l-2 2a4 4 0 0 0 5.7 5.7l1-1'], size),
+      edit: (size) => svg(['M4 20h4L19 9l-4-4L4 16z', 'M14 5l4 4'], size),
+      insert: (size) => svg(['M6 3h9l4 4v14H6z', 'M15 3v4h4', 'M9 11.5h4.5', 'M11.5 9.5l2 2-2 2'], size),
       refresh: () => svg(['M3 12a9 9 0 0 1 15-6.7L21 8', 'M21 4v4h-4', 'M21 12a9 9 0 0 1-15 6.7L3 16', 'M3 20v-4h4']),
       folder: () => svg(['M3 7V5h6l2 2h10v13H3z']),
       chevron: () => svg(['M9 5l7 7-7 7']),
@@ -1135,8 +1197,8 @@ window.__ModuleLoader__.load({
     }
 
     /** One plugin-owned bridge; Harness remains the owner of sessions, drafts and navigation. */
-    function createIntegrationBridge(ctx) {
-      let state = { modal: null, noteId: null, openRequest: 0, revision: 0 }
+    function createIntegrationBridge(ctx, rightSidebar) {
+      let state = { modal: null, noteId: null, editNote: false, openRequest: 0, asideNote: null, asideRequest: 0, revision: 0 }
       const listeners = new Set()
       let sequence = 0
       let alive = true
@@ -1159,14 +1221,28 @@ window.__ModuleLoader__.load({
         show: (kind, data = {}) => emit({ modal: { ...data, kind, key: ++sequence } }),
         close: () => emit({ modal: null }),
         error: (error) => bridge.show('error', { error: String(error?.message ?? error) }),
-        async openNote(id) {
+        /** Preview a note where it does not interrupt the chat: the right Sidebar. */
+        async openAside(id) {
+          try {
+            await api('get', { id })
+            if (!alive) return
+            // A note may have been created outside this panel (right pane, an agent
+            // tool). Let every open list pick it up before selecting.
+            bridge.changed()
+            emit({ asideNote: id, asideRequest: state.asideRequest + 1, modal: null, revision: state.revision + 1 })
+            const sidebar = rightSidebar()
+            if (sidebar && typeof sidebar.openTab === 'function') sidebar.openTab(RIGHT_TAB_KIND, {})
+            else ctx.layout.openRightbar(false, false)
+          } catch (error) { bridge.error(error) }
+        },
+        async openNote(id, options) {
           try {
             await api('get', { id })
             if (!alive) return
             // A note may have been created outside this panel (the right pane,
             // an agent tool). Let every open list pick it up before selecting.
             bridge.changed()
-            emit({ noteId: id, modal: null, openRequest: state.openRequest + 1, revision: state.revision + 1 })
+            emit({ noteId: id, modal: null, editNote: options?.edit === true, openRequest: state.openRequest + 1, revision: state.revision + 1 })
             ctx.layout.selectPanel('dsh-note')
           } catch (error) { bridge.error(error) }
         },
@@ -1181,14 +1257,36 @@ window.__ModuleLoader__.load({
             })
           } catch (error) { bridge.error(error) }
         },
+        /** Drop one or more prepared references into the current draft, without navigating. */
+        async addReferences(sessionId, preparedList) {
+          if (!Array.isArray(preparedList) || preparedList.length === 0) return
+          const reference = ctx.sessions.retain(sessionId, { source: 'dsh-note' })
+          try {
+            if (reference && typeof reference.ready?.then === 'function') await reference.ready
+            const source = ctx.uiSession.bindingSource(reference).getSnapshot()
+            const input = source.props.inputActions
+            if (!input) throw new Error(translate('link.blocked'))
+            for (const prepared of preparedList) {
+              if (!input.insertQuote(prepared.prompt, referenceSummary(prepared))) throw new Error(translate('link.blocked'))
+            }
+            input.persistDraft()
+          } finally { reference.release() }
+          for (const prepared of preparedList) {
+            try {
+              await api('recordReference', { id: prepared.note.id, sessionId, referenceId: prepared.referenceId,
+                revision: prepared.revision, scope: prepared.scope })
+            } catch { /* The draft already carries the text; the link record is best effort. */ }
+          }
+          bridge.changed()
+        },
         async addReference(targetId, prepared) {
           const insert = (reference) => {
             if (!alive) throw new Error('笔记插件已卸载')
             const source = ctx.uiSession.bindingSource(reference).getSnapshot()
             const input = source.props.inputActions
             if (!input) throw new Error('Harness 会话输入接口尚未就绪')
-            const span = input.captureInsertion()
-            if (!input.insertText(prepared.prompt, { ...span, start: span.end })) throw new Error(translate('link.blocked'))
+            // A chip keeps the composer readable; the payload expands on send.
+            if (!input.insertQuote(prepared.prompt, referenceSummary(prepared))) throw new Error(translate('link.blocked'))
             input.persistDraft()
           }
           const record = async (sessionId) => {
@@ -1234,6 +1332,18 @@ window.__ModuleLoader__.load({
         dispose: () => { alive = false; listeners.clear() },
       }
       return bridge
+    }
+
+    /** The composer chip that stands in for a note's payload while it waits in draft. */
+    function referenceSummary(prepared) {
+      const id = String(prepared?.note?.id ?? '')
+      const folder = id.includes('/') ? id.slice(0, id.lastIndexOf('/')) : ''
+      return {
+        label: translate('insert.chipLabel'),
+        title: prepared?.note?.title || prepared?.note?.id || '',
+        ...(folder ? { detail: folder } : {}),
+        body: prepared?.preview || '',
+      }
     }
 
     function useBridge(bridge) {
@@ -1577,7 +1687,7 @@ window.__ModuleLoader__.load({
           if (alive.current) setFolderBusy(false)
         }
       }
-      const label = modal.kind === 'join' ? t('link.join') : modal.kind === 'save' ? t('link.saveAnswer')
+      const label = modal.kind === 'join' ? t('link.join') : modal.kind === 'save' ? t('link.saveTitle')
         : modal.kind === 'source' ? t('link.source') : modal.kind === 'links' ? t('link.related') : t('page.saveFailed')
       const sessionList = bridge.sessions()
       const options = sessionList.ids.map((id) => sessionList.byId[id]).filter((row) => row.origin !== 'subagent')
@@ -1592,7 +1702,7 @@ window.__ModuleLoader__.load({
             !data && !error ? h('p', { className: 'dn-modal-hint' }, t('link.loading')) : null,
             result ? h('div', { className: 'dn-modal-result', role: 'status' },
               h('p', null, result.existing ? t('link.existing') : t('link.saved')),
-              h('button', { className: 'dn-modal-primary', onClick: () => bridge.openNote(result.note.id) }, t('link.openNote') + ' · ' + result.note.title),
+              h('button', { className: 'dn-modal-primary', onClick: () => bridge.openAside(result.note.id) }, t('link.openNote') + ' · ' + result.note.title),
             ) : data && modal.kind === 'join' ? h(React.Fragment, null,
               h('p', { className: 'dn-modal-hint' }, data.note.title + ' · ' + t(modal.selectedText ? 'link.selection' : 'link.full')),
               field(t('link.join'), h('select', { value: target, onChange: (event) => setTarget(event.target.value), disabled: busy },
@@ -1639,7 +1749,7 @@ window.__ModuleLoader__.load({
               h('div', { className: 'dn-modal-result' }, h('div', { className: 'dn-preview', dangerouslySetInnerHTML: { __html: renderMarkdown(data.answer.content) } })),
             ) : data && modal.kind === 'links' ? h(React.Fragment, null,
               h('p', { className: 'dn-modal-hint' }, bridge.sessionLabel(modal.sessionId)),
-              data.notes.length === 0 ? h('p', null, t('link.noNotes')) : data.notes.map((note) => h('button', { key: note.id, className: 'dn-link', onClick: () => bridge.openNote(note.id) }, note.title)),
+              data.notes.length === 0 ? h('p', null, t('link.noNotes')) : data.notes.map((note) => h('button', { key: note.id, className: 'dn-link', onClick: () => bridge.openAside(note.id) }, note.title)),
             ) : null,
           ),
           !result && data && ['join', 'save'].includes(modal.kind) ? h('div', { className: 'dn-modal-actions' },
@@ -1651,7 +1761,9 @@ window.__ModuleLoader__.load({
 
     function IntegrationOverlay({ bridge }) {
       const { modal } = useBridge(bridge)
-      return modal ? h(IntegrationDialog, { key: modal.key, bridge, modal }) : null
+      if (!modal) return null
+      if (modal.kind === 'insert') return h(InsertDialog, { key: modal.key, bridge, modal })
+      return h(IntegrationDialog, { key: modal.key, bridge, modal })
     }
 
     function AnswerSaveAction({ bridge, sessionId, messageId }) {
@@ -1664,11 +1776,169 @@ window.__ModuleLoader__.load({
     }
 
     function RelatedNotesAction({ bridge, sessionId }) {
-      return h('button', { className: 'dn-hdrbtn', onClick: () => bridge.show('links', { sessionId }) }, ICONS.note(14), h('span', null, translate('link.related')))
+      return h(Tip, { label: translate('link.relatedScope') }, h('button', {
+        type: 'button',
+        className: 'dn-hdrbtn icon',
+        onClick: () => bridge.show('links', { sessionId }),
+      }, ICONS.relate(14)))
+    }
+
+    /** Composer entry: drop one or more notes into the draft straight from the input row. */
+    function ComposerInsert({ bridge, sessionId }) {
+      const label = translate('insert.button')
+      // Clicking a button collapses the DOM selection, so the mousedown is held
+      // back: a passage selected in a note preview survives into the picker.
+      const open = () => {
+        const active = window.getSelection?.()
+        const text = String(active?.toString?.() ?? '').trim()
+        const holder = active?.anchorNode?.parentElement?.closest?.('.dn-preview[data-note-id]')
+        if (!text || !holder) { bridge.show('insert', { sessionId }); return }
+        bridge.show('insert', { sessionId, selection: { noteId: holder.dataset.noteId, text } })
+      }
+      return h(Tip, { label }, h('button', {
+        type: 'button',
+        className: 'dn-composer-action',
+        onMouseDown: (event) => event.preventDefault(),
+        onClick: open,
+      }, ICONS.insert(16)))
+    }
+
+    /** Multi-select picker for the composer entry; the draft is the only target. */
+    function InsertDialog({ bridge, modal }) {
+      const t = useT()
+      const [notes, setNotes] = useState([])
+      const [query, setQuery] = useState('')
+      const [picked, setPicked] = useState([])
+      const [loading, setLoading] = useState(true)
+      const [busy, setBusy] = useState(false)
+      const [error, setError] = useState('')
+      const selection = modal.selection ?? null
+      const [scope, setScope] = useState(selection ? 'selection' : 'full')
+      const dialog = useRef(null)
+      const alive = useRef(true)
+
+      useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
+      useEffect(() => {
+        let current = true
+        api('list').then((result) => {
+          if (!current) return
+          setNotes(Array.isArray(result?.notes) ? result.notes : [])
+          setLoading(false)
+        }).catch((failure) => {
+          if (!current) return
+          setError(String(failure?.message ?? failure))
+          setLoading(false)
+        })
+        return () => { current = false }
+      }, [])
+      useEffect(() => {
+        const previous = document.activeElement
+        const root = dialog.current
+        root?.querySelector('input')?.focus()
+        const onKey = (event) => {
+          if (event.key !== 'Escape' || busy) return
+          event.preventDefault()
+          bridge.close()
+        }
+        root?.addEventListener('keydown', onKey)
+        return () => {
+          root?.removeEventListener('keydown', onKey)
+          if (previous?.isConnected) previous.focus()
+        }
+      }, [bridge, busy])
+
+      const visible = useMemo(() => filterTargetNotes(notes, query), [notes, query])
+      const toggle = (id) => setPicked((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
+      const ready = scope === 'selection' ? Boolean(selection) : picked.length > 0
+      const submit = async () => {
+        if (busy || !ready) return
+        setBusy(true)
+        setError('')
+        try {
+          const prepared = []
+          if (scope === 'selection') {
+            prepared.push(await api('prepareReference', { id: selection.noteId, selectedText: selection.text }))
+          } else {
+            for (const id of picked) prepared.push(await api('prepareReference', { id }))
+          }
+          await bridge.addReferences(modal.sessionId, prepared)
+          if (alive.current) bridge.close()
+        } catch (failure) {
+          if (alive.current) setError(String(failure?.message ?? failure))
+        } finally { if (alive.current) setBusy(false) }
+      }
+
+      return h('div', { className: 'dn-modal-shade' },
+        h('div', { className: 'dn-modal', role: 'dialog', 'aria-modal': true, 'aria-labelledby': 'dn-insert-title', ref: dialog },
+          h('div', { className: 'dn-modal-heading' },
+            h('h2', { id: 'dn-insert-title' }, t('insert.title')),
+            h('button', { className: 'dn-iconbtn', disabled: busy, onClick: bridge.close }, t('link.close'))),
+          h('div', { className: 'dn-modal-main' },
+            error ? h('div', { className: 'dn-modal-error', role: 'alert' }, error) : null,
+            h('p', { className: 'dn-modal-hint' }, t('insert.hint')),
+            h('div', { className: 'dn-scope', role: 'group', 'aria-label': t('insert.scope') },
+              h('button', {
+                type: 'button',
+                className: 'dn-scope-btn' + (scope === 'full' ? ' on' : ''),
+                'aria-pressed': scope === 'full',
+                disabled: busy,
+                onClick: () => setScope('full'),
+              }, t('insert.scopeFull')),
+              h('button', {
+                type: 'button',
+                className: 'dn-scope-btn' + (scope === 'selection' ? ' on' : ''),
+                'aria-pressed': scope === 'selection',
+                disabled: busy || !selection,
+                title: selection ? undefined : t('insert.noSelection'),
+                onClick: () => { if (selection) setScope('selection') },
+              }, t('insert.scopeSelection'))),
+            !selection ? h('p', { className: 'dn-modal-hint' }, t('insert.noSelection')) : null,
+            scope === 'selection' && selection
+              ? h('div', { className: 'dn-scope-preview' }, selection.text)
+              : h('div', { className: 'dn-target-search' },
+              ICONS.search(15),
+              h('input', {
+                type: 'search',
+                value: query,
+                disabled: busy,
+                autoComplete: 'off',
+                spellCheck: false,
+                placeholder: t('insert.search'),
+                'aria-label': t('insert.search'),
+                onChange: (event) => setQuery(event.target.value),
+              })),
+            scope === 'selection' && selection ? null : loading
+              ? h('p', { className: 'dn-modal-hint' }, t('link.loading'))
+              : h('div', { className: 'dn-target-list', role: 'group', 'aria-label': t('insert.title') },
+                  visible.length === 0
+                    ? h('p', { className: 'dn-target-empty' }, t('insert.empty'))
+                    : visible.map((note) => {
+                        const on = picked.includes(note.id)
+                        const folder = relativeFolderOf(note.id, '')
+                        return h('button', {
+                          key: note.id,
+                          type: 'button',
+                          className: 'dn-target-option',
+                          'aria-pressed': on,
+                          onClick: () => toggle(note.id),
+                        },
+                          h('span', { className: 'dn-target-check', 'aria-hidden': true }, on ? ICONS.check(14) : null),
+                          h('span', { className: 'dn-target-copy' },
+                            h('span', { className: 'dn-target-title' }, note.title || note.id),
+                            folder ? h('span', { className: 'dn-target-folder' }, folder) : null),
+                        )
+                      })),
+          ),
+          h('div', { className: 'dn-modal-actions' },
+            h('button', { className: 'dn-iconbtn', disabled: busy, onClick: bridge.close }, t('page.cancel')),
+            h('button', { className: 'dn-modal-primary', type: 'button', disabled: busy || !ready, onClick: submit },
+              busy ? t('page.saving') : t('insert.confirm')(scope === 'selection' ? 1 : picked.length))),
+        ),
+      )
     }
 
     function NoteReference({ bridge, node, interactive, raw }) {
-      return interactive ? h('button', { className: 'dn-link', onClick: () => bridge.openNote(node.data.noteId) }, node.data.label) : h('span', null, node.data.label || raw)
+      return interactive ? h('button', { className: 'dn-link', onClick: () => bridge.openAside(node.data.noteId) }, node.data.label) : h('span', null, node.data.label || raw)
     }
 
     /** Build the hierarchy from actual vault directories; filters retain ancestors. */
@@ -2281,6 +2551,7 @@ window.__ModuleLoader__.load({
           mode !== 'edit'
             ? h('div', {
                 className: 'dn-preview',
+                'data-note-id': note.id,
                 style: mode === 'split' ? { flex: '0 1 ' + ((1 - splitRatio) * 100) + '%' } : undefined,
                 dangerouslySetInnerHTML: { __html: previewHtml },
               })
@@ -2406,6 +2677,9 @@ window.__ModuleLoader__.load({
         setQuery('')
         setActiveFolder(parentFolder(integration.noteId))
         revealFolder(parentFolder(integration.noteId))
+        // Landing from the preview with "edit" opens the source editor, the same
+        // way a freshly created note starts in edit mode.
+        if (integration.editNote) setEditingNewId(integration.noteId)
       }, [integration.openRequest])
 
       const refresh = useCallback(async (keepSelection = true) => {
@@ -2774,6 +3048,9 @@ window.__ModuleLoader__.load({
         }
         setTimeout(() => setState('idle'), 2200)
       }
+      /* No visible label: the pill is the glyph, so its hint carries both the
+         action and its scope, and a state change has to announce itself because
+         the text that used to do that is gone. */
       const label =
         state === 'saving'
           ? t('page.depositing')
@@ -2781,17 +3058,26 @@ window.__ModuleLoader__.load({
             ? t('page.deposited')
             : state === 'error'
               ? t('page.depositFailed')
-              : t('page.deposit')
+              : t('page.depositScope')
       return h(React.Fragment, null, h(
-        'button',
-        {
-          className: 'dn-hdrbtn' + (state === 'done' ? ' ok' : state === 'error' ? ' err' : ''),
-          onClick: run,
-          title: t('page.deposit'),
-        },
-        ICONS.deposit(14),
-        h('span', null, label),
-      ), savedNoteId ? h('button', { className: 'dn-hdrbtn', onClick: () => props.bridge.openNote(savedNoteId) }, t('link.openNote')) : null)
+        Tip,
+        { label },
+        h(
+          'button',
+          {
+            type: 'button',
+            className: 'dn-hdrbtn icon lead' + (state === 'done' ? ' ok' : state === 'error' ? ' err' : ''),
+            'aria-busy': state === 'saving' ? 'true' : undefined,
+            onClick: run,
+          },
+          ICONS.deposit(14),
+        ),
+      ), state === 'idle' ? null : h('span', { className: 'dn-sr', role: 'status' }, label),
+      savedNoteId ? h(Tip, { label: t('link.openSaved') }, h('button', {
+        type: 'button',
+        className: 'dn-hdrbtn icon',
+        onClick: () => props.bridge.openAside(savedNoteId),
+      }, ICONS.open(14))) : null)
     }
 
     // -------------------------------------------------------------- settings
@@ -3137,6 +3423,7 @@ window.__ModuleLoader__.load({
 
     function WorkspaceNotesPane({ bridge, runtime, rightSessionId }) {
       const t = useT()
+      const bridgeState = useBridge(bridge)
       const vault = useWorkspaceVault()
       const workspace = useCurrentWorkspace(runtime, rightSessionId)
       const [fontSize, setFontSize] = useState(currentFontSize)
@@ -3163,8 +3450,11 @@ window.__ModuleLoader__.load({
       }, [workspace?.path])
 
       useEffect(() => {
+        // A refresh in flight has not listed a note created moments ago; clearing
+        // now would drop the selection the user just made.
+        if (vault.loading) return
         if (selectedId && !vault.notes.some((note) => note.id === selectedId)) setSelectedId(null)
-      }, [vault.notes, selectedId])
+      }, [vault.notes, selectedId, vault.loading])
 
       // Opening a note replaces the visible list; land focus on the detail's
       // back control instead of leaving it on a row that is now hidden.
@@ -3201,6 +3491,19 @@ window.__ModuleLoader__.load({
           return haystack.includes(needle)
         })
       }, [scopedNotes, needle])
+      // The header's "open" lands here instead of taking over the main panel, so a
+      // saved note is one glance away and the chat keeps its place. Only the latest
+      // request is honoured; a refresh of the vault list must not re-select.
+      const asideSeen = useRef(0)
+      useEffect(() => {
+        const request = bridgeState.asideRequest
+        if (!request || bridgeState.asideNote === null || asideSeen.current === request) return
+        asideSeen.current = request
+        setActionError('')
+        setSelectedId(bridgeState.asideNote)
+        if (scopedNotes.every((note) => note.id !== bridgeState.asideNote)) setShowAll(true)
+      }, [bridgeState.asideRequest, bridgeState.asideNote, scopedNotes])
+
       const selected = selectedId ? vault.notes.find((note) => note.id === selectedId) : undefined
       const resolving = vault.loading && vault.root === ''
       const scoped = workspace !== undefined && !resolving && scope.mode === 'folder'
@@ -3240,7 +3543,7 @@ window.__ModuleLoader__.load({
           const result = await api('create', { title: t('right.untitled'), folder })
           setBusy(false)
           vault.refresh()
-          await bridge.openNote(result.note.id)
+          setSelectedId(result.note.id)
         } catch (failure) {
           setBusy(false)
           setActionError(t('right.createFailed') + ' · ' + String(failure?.message ?? failure))
@@ -3365,6 +3668,17 @@ window.__ModuleLoader__.load({
                 ),
               ),
               h('span', { className: 'dn-right-detailtitle', title: selected.title }, selected.title || selected.id),
+              h(Tip, { label: t('right.edit') },
+                h(
+                  'button',
+                  {
+                    className: 'dn-right-icon',
+                    type: 'button',
+                    onClick: () => bridge.openNote(selected.id, { edit: true }),
+                  },
+                  ICONS.edit(16),
+                ),
+              ),
               h(Tip, { label: t('right.openPanel') },
                 h(
                   'button',
@@ -3389,6 +3703,7 @@ window.__ModuleLoader__.load({
               { className: 'dn-right-scroll' },
               h('div', {
                 className: 'dn-preview dn-right-preview',
+                'data-note-id': selected.id,
                 dangerouslySetInnerHTML: { __html: renderPreview(selected.content) },
               }),
             ),
@@ -3507,7 +3822,8 @@ window.__ModuleLoader__.load({
 
     /** Register panels, the session action, and the stylesheet. */
     function apply(ctx) {
-      const bridge = createIntegrationBridge(ctx)
+      let rightSidebar = null
+      const bridge = createIntegrationBridge(ctx, () => rightSidebar)
       ctx.effect(() => () => bridge.dispose(), 'dsh-note: integration lifetime')
       ctx.effect(() => ctx.locale.register(NS, { zh: ZH, en: EN }), 'dsh-note: dictionaries')
 
@@ -3547,7 +3863,9 @@ window.__ModuleLoader__.load({
 
       // The right sidebar is optional in a stripped-down Harness build. Wait for
       // its tab service instead of making it a hard dependency of the panel.
-      ctx.inject(['sidebarRightTabs'], (rightCtx) => {
+      ctx.inject(['sidebarRightTabs', 'sidebarRight'], (rightCtx) => {
+        rightSidebar = rightCtx.sidebarRight
+        rightCtx.effect(() => () => { if (rightSidebar === rightCtx.sidebarRight) rightSidebar = null })
         rightCtx.effect(() => rightCtx.sidebarRightTabs.register({
           id: RIGHT_TAB_ID,
           kind: RIGHT_TAB_KIND,
@@ -3601,6 +3919,9 @@ window.__ModuleLoader__.load({
       ctx.slots.inject('conversation.session.header.actions', () => ctx.slots.register({
         name: 'conversation.session.header.actions', id: 'dsh-note-links', order: 31, locale: NS,
       }, (props) => h(RelatedNotesAction, { ...props, bridge })))
+      ctx.slots.inject('conversation.input.left', () => ctx.slots.register({
+        name: 'conversation.input.left', id: 'dsh-note-insert', order: 40, locale: NS,
+      }, (props) => h(ComposerInsert, { ...props, bridge })))
       ctx.slots.inject('conversation.chat.assistant-actions', () => ctx.slots.register({
         name: 'conversation.chat.assistant-actions', id: 'dsh-note-save-answer', order: 25, locale: NS,
       }, (props) => h(AnswerSaveAction, { ...props, bridge })))
