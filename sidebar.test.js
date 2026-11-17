@@ -4,10 +4,11 @@ import { readFile } from 'node:fs/promises'
 import vm from 'node:vm'
 
 const source = await readFile(new URL('./client.js', import.meta.url), 'utf8')
-const helpers = source.slice(source.indexOf('    function filterNotes('), source.indexOf('    /** The same overlay hosts'))
+const helpers = source.slice(source.indexOf('    function filterNotes('), source.indexOf('    /** Searchable target-note picker'))
+const parentSource = source.slice(source.indexOf('    function parentFolder('), source.indexOf('    /** One plugin-owned bridge'))
 const plainStart = source.indexOf('    function plainInline(')
 const plain = source.slice(plainStart, source.indexOf('\n    //', plainStart))
-const { filterNotes, filterTodos, createEditorDraft } = vm.runInNewContext(plain + helpers + '\n({filterNotes,filterTodos,createEditorDraft})')
+const { filterNotes, filterTodos, filterTargetNotes, createEditorDraft } = vm.runInNewContext(plain + parentSource + helpers + '\n({filterNotes,filterTodos,filterTargetNotes,createEditorDraft})')
 const note = (patch = {}) => ({ id: 'note', title: '文档', content: '- [ ] 联调', tags: ['接口'], updated: '2026-11-09T01:00:00Z', revision: 'rev-1', pinned: false, starred: false, ...patch })
 
 test('favorites use stars, tags and search compose, and recent ignores pin priority', () => {
@@ -21,6 +22,28 @@ test('favorites use stars, tags and search compose, and recent ignores pin prior
   assert.equal(recent.length, 15)
   assert.equal(recent[0].id, '15')
   assert.ok(!recent.some((item) => item.id === 'old-pin'))
+})
+
+test('target note search ranks title and folder hits and accepts loose subsequences', () => {
+  const notes = [
+    note({ id: 'meeting', title: '周会记录 · 11 月第 2 周' }),
+    note({ id: 'docs/api', title: '接口联调备忘' }),
+    note({ id: 'plugin', title: 'DSH 笔记插件 · 开发备忘' }),
+  ]
+  assert.equal(filterTargetNotes(notes, '周会')[0].id, 'meeting')
+  assert.equal(filterTargetNotes(notes, 'docs')[0].id, 'docs/api')
+  assert.equal(filterTargetNotes(notes, '开发备忘')[0].id, 'plugin')
+  assert.equal(filterTargetNotes(notes, 'ds笔记').map((item) => item.id).join(), 'plugin')
+  assert.equal(filterTargetNotes(notes, '周会记录').length, 1)
+  assert.equal(filterTargetNotes(notes, '不存在').length, 0)
+  assert.equal(filterTargetNotes(notes, '').map((item) => item.id).join(), 'meeting,docs/api,plugin')
+  const ranked = [
+    note({ id: 'loose', title: '开 发' }),
+    note({ id: 'exact', title: '开发' }),
+    note({ id: 'prefix', title: '开发备忘' }),
+    note({ id: 'substring', title: '今日开发备忘' }),
+  ]
+  assert.equal(filterTargetNotes(ranked, '开发').map((item) => item.id).join(), 'exact,prefix,substring,loose')
 })
 
 test('todo search matches task labels, source titles and tags in both states', () => {

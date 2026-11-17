@@ -70,9 +70,11 @@ Text is inserted through Harness's native input path, so existing draft text, qu
 
 ### Save an answer to a note
 
-"Save answer to note" in the assistant action row creates a note or appends to an existing one, with a preview before saving.
+The save-to-note icon in the assistant action row (tooltip: "Save answer to note") creates a note or appends to an existing one, with a preview before saving. When appending, filter targets by title or folder and use the arrow keys plus Enter to pick one.
 
 - Only text from the durable assistant message is read — no reasoning, no tool calls.
+- "Folder" lists real subdirectories in the vault (including empty ones, sorted by path); the first option is the vault root.
+- When creating a note, the "+" next to Folder creates a folder under the selected location and selects it.
 - Saving the same source twice de-duplicates.
 - Appending checks the target note revision first and asks for confirmation if it changed.
 

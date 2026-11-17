@@ -17,6 +17,37 @@ window.__ModuleLoader__.load({
     const NS = 'dsh-note'
     const API = '/api/dsh-note'
 
+    // ------------------------------------------------------------- host tips
+    // 宿主的核心按钮都用设计系统的 Tooltip 包一层（深色气泡、悬停即出）；插件塞进
+    // 宿主插槽的按钮宿主不会替它包。只挂原生 title 的话，提示要等约一秒、跟随鼠标、
+    // 还是系统样式，观感上像"这个图标没有提示"。能拿到 primitives 就复用宿主组件，
+    // 拿不到（更老的宿主）退回原生 title。
+    const hostPrimitives = (() => {
+      try {
+        return require('@deepseek-ai/dsh-client-ui-primitives')
+      } catch {
+        return null
+      }
+    })()
+    const HostTooltip = hostPrimitives && typeof hostPrimitives.Tooltip === 'function' ? hostPrimitives.Tooltip : null
+
+    /** 提示文案落到按钮上：补 aria-label，去掉会被系统接管的原生 title。 */
+    function tipChild(child, label) {
+      const props = child.props || {}
+      const extra = {}
+      if (props['aria-label'] === undefined) extra['aria-label'] = label
+      if (props.title !== undefined) extra.title = undefined
+      if (HostTooltip === null) extra.title = label
+      return React.cloneElement(child, extra)
+    }
+
+    /** 宿主风格气泡提示；宿主没提供 Tooltip 时退回原生 title。 */
+    function Tip({ label, side = 'bottom', delayMs = 0, children }) {
+      if (!React.isValidElement(children) || label === undefined || label === null || label === '') return children
+      const child = tipChild(children, label)
+      return HostTooltip === null ? child : h(HostTooltip, { label, side, delayMs, portal: true }, child)
+    }
+
     // ---------------------------------------------------------------- locale
     const ZH = {
       'panel.label': '笔记',
@@ -48,8 +79,12 @@ window.__ModuleLoader__.load({
       'link.createNote': '新建笔记',
       'link.appendNote': '追加到已有笔记',
       'link.target': '目标笔记',
+      'link.targetSearch': '搜索标题或文件夹…',
+      'link.selected': '已选',
+      'link.noTargetMatch': '没有匹配的笔记',
       'link.title': '笔记标题',
       'link.folder': '保存位置',
+      'link.vaultRoot': '笔记库根目录',
       'link.loading': '读取中…',
       'link.save': '保存',
       'link.close': '关闭',
@@ -82,7 +117,7 @@ window.__ModuleLoader__.load({
       'page.more': '更多操作',
       'page.views': '切换视图',
       'right.title': '工作区笔记',
-      'right.guide': '浏览当前工作区的笔记，点开即可阅读',
+      'right.guide': '按工作区浏览笔记，点开即读',
       'right.workspace': '工作区',
       'right.all': '全部笔记',
       'right.wholeVault': '整个笔记库',
@@ -207,8 +242,12 @@ window.__ModuleLoader__.load({
       'link.createNote': 'New note',
       'link.appendNote': 'Append to an existing note',
       'link.target': 'Target note',
+      'link.targetSearch': 'Search titles or folders…',
+      'link.selected': 'Selected',
+      'link.noTargetMatch': 'No matching notes',
       'link.title': 'Note title',
       'link.folder': 'Folder',
+      'link.vaultRoot': 'Vault root',
       'link.loading': 'Loading…',
       'link.save': 'Save',
       'link.close': 'Close',
@@ -241,7 +280,7 @@ window.__ModuleLoader__.load({
       'page.more': 'More actions',
       'page.views': 'Switch view',
       'right.title': 'Workspace notes',
-      'right.guide': 'Browse notes in the current workspace and read them here',
+      'right.guide': 'Browse notes in this workspace',
       'right.workspace': 'Workspace',
       'right.all': 'All notes',
       'right.wholeVault': 'Whole vault',
@@ -667,9 +706,10 @@ window.__ModuleLoader__.load({
       .dn-source-row{display:flex;align-items:center;gap:8px;margin:6px 0;}
       .dn-link{border:0;background:transparent;color:var(--dn-accent);font:inherit;cursor:pointer;text-align:left;padding:2px 0;}
       .dn-link:hover{text-decoration:underline;text-underline-offset:2px;}
-      .dn-answer-action{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:var(--dn-ink-2);font-size:var(--dn-fs-2xs);cursor:pointer;padding:4px 6px;border-radius:var(--dn-r-sm);transition:background var(--dn-ease),color var(--dn-ease);}
-      .dn-answer-action:hover{background:var(--dn-paper-3);color:var(--dn-ink);}
-      .dn-answer-action svg{width:15px;height:15px;}
+      .dn-answer-action{display:inline-flex;flex:none;align-items:center;justify-content:center;width:calc(28px + var(--dsh-content-font-delta,0px));height:calc(28px + var(--dsh-content-font-delta,0px));box-sizing:border-box;border:0;background:transparent;color:var(--dsw-alias-label-tertiary,var(--dn-ink-2));line-height:1;cursor:pointer;padding:0;border-radius:var(--dn-r-sm);transition:background var(--dn-ease),color var(--dn-ease);}
+      .dn-answer-action:hover{background:var(--dsw-alias-interactive-bg-hover,var(--dn-paper-3));color:var(--dsw-alias-label-secondary,var(--dn-ink));}
+      .dn-answer-action:focus-visible{outline:2px solid var(--dn-accent);outline-offset:2px;}
+      .dn-answer-action svg{width:calc(17px + var(--dsh-content-font-delta,0px));height:calc(17px + var(--dsh-content-font-delta,0px));}
 
       /* --------------------------------------------------------------- modals */
       .dn-modal-shade{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--dn-ink) 45%,transparent);backdrop-filter:blur(2px);padding:24px;color:var(--dn-ink);font-size:var(--dn-fs-sm);animation:dn-fade 160ms ease-out;}
@@ -683,6 +723,35 @@ window.__ModuleLoader__.load({
       .dn-modal label{display:flex;flex-direction:column;gap:6px;font-size:var(--dn-fs-xs);color:var(--dn-ink-2);}
       .dn-modal input,.dn-modal select{box-sizing:border-box;width:100%;height:34px;border:1px solid var(--dn-line);border-radius:var(--dn-r-md);padding:0 10px;background:var(--dn-paper-3);color:var(--dn-ink);font:inherit;font-size:var(--dn-fs-sm);outline:none;transition:border-color var(--dn-ease),background var(--dn-ease);}
       .dn-modal input:focus,.dn-modal select:focus{border-color:var(--dn-accent);background:var(--dn-paper);}
+      .dn-target-picker{display:flex;flex-direction:column;gap:8px;min-width:0;}
+      .dn-target-search{position:relative;display:flex;align-items:center;}
+      .dn-target-search>svg{position:absolute;left:10px;width:15px;height:15px;color:var(--dn-ink-2);pointer-events:none;}
+      .dn-target-search input{padding-left:32px;}
+      .dn-target-selected{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:var(--dn-fs-2xs);line-height:1.5;color:var(--dn-ink-2);}
+      .dn-target-selected span{flex:none;}
+      .dn-target-selected strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dn-ink);font-weight:600;}
+      .dn-target-list{position:relative;display:flex;flex-direction:column;gap:1px;max-height:216px;min-height:44px;overflow-y:auto;overscroll-behavior:contain;padding:4px;border:1px solid var(--dn-line);border-radius:var(--dn-r-md);background:var(--dn-paper-2);scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--dn-ink) 18%,transparent) transparent;}
+      .dn-target-option{display:flex;align-items:flex-start;gap:8px;width:100%;box-sizing:border-box;padding:7px 8px;border:0;border-radius:var(--dn-r-sm);background:transparent;color:var(--dn-ink);font:inherit;text-align:left;cursor:pointer;}
+      .dn-target-option:hover{background:color-mix(in srgb,var(--dn-ink) 5%,transparent);}
+      .dn-target-option[data-active=true]{background:color-mix(in srgb,var(--dn-ink) 7%,transparent);box-shadow:inset 0 0 0 1px var(--dn-line);}
+      .dn-target-option[aria-selected=true]{background:var(--dn-accent-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dn-accent) 32%,transparent);}
+      .dn-target-option[aria-selected=true] .dn-target-title{color:var(--dn-accent);font-weight:600;}
+      .dn-target-check{flex:none;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;margin-top:2px;color:var(--dn-accent);}
+      .dn-target-check svg{width:14px;height:14px;}
+      .dn-target-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+      .dn-target-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;font-size:var(--dn-fs-sm);font-weight:500;line-height:1.4;}
+      .dn-target-folder{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dn-ink-2);font-size:var(--dn-fs-2xs);line-height:1.4;}
+      .dn-target-empty{padding:12px 10px;text-align:center;color:var(--dn-ink-2);font-size:var(--dn-fs-xs);}
+      .dn-folderfield{display:flex;flex-direction:column;gap:6px;}
+      .dn-folderpick{display:flex;align-items:center;gap:6px;min-width:0;}
+      .dn-folderpick select{flex:1;min-width:0;}
+      .dn-folderadd{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--dn-line);border-radius:var(--dn-r-md);background:var(--dn-paper-3);color:var(--dn-ink-2);cursor:pointer;transition:background var(--dn-ease),color var(--dn-ease),border-color var(--dn-ease);}
+      .dn-folderadd:hover{background:var(--dn-paper);color:var(--dn-ink);border-color:color-mix(in srgb,var(--dn-accent) 40%,var(--dn-line));}
+      .dn-folderadd:disabled{opacity:.5;cursor:default;}
+      .dn-folderadd:disabled:hover{background:var(--dn-paper-3);color:var(--dn-ink-2);border-color:var(--dn-line);}
+      .dn-folderadd svg{width:16px;height:16px;}
+      .dn-foldercreate{border:1px dashed var(--dn-line);border-radius:var(--dn-r-md);background:var(--dn-paper-2);}
+      .dn-foldercreate .dn-iconbtn{height:32px;}
       .dn-modal-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;}
       .dn-modal-primary{border:0;border-radius:var(--dn-r-md);padding:8px 18px;background:var(--dn-accent);color:var(--dn-paper);font:inherit;font-weight:600;cursor:pointer;transition:background var(--dn-ease),color var(--dn-ease),filter var(--dn-ease);}
       .dn-modal-primary:hover{filter:brightness(1.08);}
@@ -1196,6 +1265,43 @@ window.__ModuleLoader__.load({
       return todos.filter((todo) => [plainInline(todo.text), todo.noteTitle, ...(byId.get(todo.noteId)?.tags ?? [])].join('\n').toLowerCase().includes(needle))
     }
 
+    /** Rank append targets: exact, prefix, substring and folder hits before loose subsequences. */
+    function filterTargetNotes(notes, query) {
+      const needle = String(query ?? '').trim().toLowerCase()
+      if (!needle) return notes
+      const ranked = []
+      notes.forEach((note, index) => {
+        const title = String(note?.title ?? '').toLowerCase()
+        const folder = parentFolder(String(note?.id ?? '')).toLowerCase()
+        let score = null
+        if (title === needle) score = 0
+        else if (title.startsWith(needle)) score = 1
+        else if (title.includes(needle)) score = 2
+        else if (folder.includes(needle)) score = 3
+        else {
+          const titleGap = subsequenceGap(title, needle)
+          const folderGap = titleGap === null ? subsequenceGap(folder, needle) : null
+          if (titleGap !== null) score = 4 + titleGap
+          else if (folderGap !== null) score = 5 + folderGap
+        }
+        if (score !== null) ranked.push({ note, score, index })
+      })
+      return ranked.sort((a, b) => a.score - b.score || a.index - b.index).map((entry) => entry.note)
+    }
+
+    /** Count skipped characters for a loose subsequence match; null means no match. */
+    function subsequenceGap(text, needle) {
+      let from = 0
+      let gap = 0
+      for (const char of needle) {
+        const at = text.indexOf(char, from)
+        if (at < 0) return null
+        gap += at - from
+        from = at + char.length
+      }
+      return gap
+    }
+
     /** Own editable fields, sequential saves and clean-only adoption of refreshed note content. */
     function createEditorDraft(note, save) {
       let baseline = note
@@ -1250,6 +1356,119 @@ window.__ModuleLoader__.load({
       return draft
     }
 
+    /** Searchable target-note picker for appending an answer to an existing note. */
+    function NoteTargetPicker({ notes, value, disabled, onChange }) {
+      const t = useT()
+      const [query, setQuery] = useState('')
+      const [active, setActive] = useState(0)
+      const searchRef = useRef(null)
+      const listRef = useRef(null)
+      const visible = useMemo(() => filterTargetNotes(notes, query), [notes, query])
+      const selected = notes.find((note) => note.id === value) ?? null
+      const activeIndex = visible.length === 0 ? -1 : Math.min(active, visible.length - 1)
+      const listId = 'dn-target-listbox'
+      const optionId = (index) => `dn-target-option-${index}`
+
+      useEffect(() => {
+        const selectedIndex = visible.findIndex((note) => note.id === value)
+        setActive(selectedIndex >= 0 ? selectedIndex : 0)
+        if (listRef.current) listRef.current.scrollTop = 0
+      }, [query])
+
+      const reveal = (index) => {
+        const list = listRef.current
+        const row = list?.querySelector(`[data-index="${index}"]`)
+        if (!list || !row) return
+        if (row.offsetTop < list.scrollTop) list.scrollTop = row.offsetTop
+        else if (row.offsetTop + row.offsetHeight > list.scrollTop + list.clientHeight) {
+          list.scrollTop = row.offsetTop + row.offsetHeight - list.clientHeight
+        }
+      }
+
+      const choose = (note, index) => {
+        if (disabled || !note) return
+        setActive(index)
+        onChange(note.id)
+        searchRef.current?.focus({ preventScroll: true })
+      }
+
+      const onKeyDown = (event) => {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault()
+          if (visible.length === 0) return
+          const step = event.key === 'ArrowDown' ? 1 : -1
+          const next = (activeIndex + step + visible.length) % visible.length
+          setActive(next)
+          reveal(next)
+        } else if (event.key === 'Home' || event.key === 'End') {
+          if (visible.length === 0) return
+          event.preventDefault()
+          const next = event.key === 'Home' ? 0 : visible.length - 1
+          setActive(next)
+          reveal(next)
+        } else if (event.key === 'Enter' && activeIndex >= 0) {
+          event.preventDefault()
+          choose(visible[activeIndex], activeIndex)
+        }
+      }
+
+      return h('div', { className: 'dn-target-picker' },
+        h('label', { htmlFor: 'dn-target-search' }, t('link.target')),
+        h('div', { className: 'dn-target-search' },
+          ICONS.search(15),
+          h('input', {
+            id: 'dn-target-search',
+            ref: searchRef,
+            type: 'search',
+            value: query,
+            disabled,
+            autoFocus: true,
+            autoComplete: 'off',
+            spellCheck: false,
+            role: 'combobox',
+            'aria-expanded': true,
+            'aria-controls': listId,
+            'aria-autocomplete': 'list',
+            'aria-activedescendant': activeIndex >= 0 ? optionId(activeIndex) : undefined,
+            placeholder: t('link.targetSearch'),
+            onChange: (event) => setQuery(event.target.value),
+            onKeyDown,
+          }),
+        ),
+        selected ? h('div', { className: 'dn-target-selected' },
+          h('span', null, t('link.selected')),
+          h('strong', { title: selected.title }, selected.title),
+        ) : null,
+        h('div', { className: 'dn-target-list', id: listId, role: 'listbox', 'aria-label': t('link.target'), ref: listRef },
+          visible.length === 0
+            ? h('div', { className: 'dn-target-empty' }, t('link.noTargetMatch'))
+            : visible.map((note, index) => {
+              const folder = parentFolder(note.id)
+              const isSelected = note.id === value
+              return h('div', {
+                key: note.id,
+                id: optionId(index),
+                role: 'option',
+                'aria-selected': isSelected,
+                'data-index': index,
+                'data-active': index === activeIndex ? 'true' : undefined,
+                className: 'dn-target-option',
+                title: folder ? note.title + ' · ' + folder : note.title,
+                onMouseDown: (event) => event.preventDefault(),
+                onMouseEnter: () => setActive(index),
+                onClick: () => choose(note, index),
+              },
+                h('span', { className: 'dn-target-check', 'aria-hidden': true }, isSelected ? ICONS.check(14) : null),
+                h('span', { className: 'dn-target-copy' },
+                  h('span', { className: 'dn-target-title' }, highlightText(note.title, query)),
+                  folder ? h('span', { className: 'dn-target-folder' }, highlightText(folder, query)) : null,
+                ),
+              )
+            }),
+        ),
+      )
+    }
+
     /** The same overlay hosts save, provenance and draft choices without a second chat implementation. */
     function IntegrationDialog({ bridge, modal }) {
       const t = useT()
@@ -1263,7 +1482,12 @@ window.__ModuleLoader__.load({
       const [folder, setFolder] = useState('')
       const [targetNote, setTargetNote] = useState('')
       const [loadKey, setLoadKey] = useState(0)
+      const [folderDraft, setFolderDraft] = useState(null)
+      const [folderBusy, setFolderBusy] = useState(false)
+      const [folderError, setFolderError] = useState('')
       const dialog = useRef(null)
+      const folderSelectRef = useRef(null)
+      const folderAddRef = useRef(null)
       const alive = useRef(true)
       useEffect(() => {
         const previous = document.activeElement
@@ -1322,6 +1546,37 @@ window.__ModuleLoader__.load({
           }
         } finally { if (alive.current) setBusy(false) }
       }
+      const beginFolder = () => {
+        if (busy || folderBusy || folderDraft !== null) return
+        setFolderDraft('')
+        setFolderError('')
+      }
+      const cancelFolder = () => {
+        if (folderBusy) return
+        setFolderDraft(null)
+        setFolderError('')
+        window.requestAnimationFrame(() => folderAddRef.current?.focus())
+      }
+      const createFolder = async (event) => {
+        event.preventDefault()
+        const name = folderDraft?.trim() ?? ''
+        if (name === '' || folderBusy) return
+        setFolderBusy(true)
+        setFolderError('')
+        try {
+          const created = await api('createFolder', { name, parent: folder })
+          if (!alive.current) return
+          setData((current) => current ? { ...current, folders: [...current.folders, created.folder] } : current)
+          setFolder(created.folder.path)
+          setFolderDraft(null)
+          bridge.changed()
+          window.requestAnimationFrame(() => folderSelectRef.current?.focus())
+        } catch {
+          if (alive.current) setFolderError(t('page.folderError'))
+        } finally {
+          if (alive.current) setFolderBusy(false)
+        }
+      }
       const label = modal.kind === 'join' ? t('link.join') : modal.kind === 'save' ? t('link.saveAnswer')
         : modal.kind === 'source' ? t('link.source') : modal.kind === 'links' ? t('link.related') : t('page.saveFailed')
       const sessionList = bridge.sessions()
@@ -1349,14 +1604,35 @@ window.__ModuleLoader__.load({
               data.truncated ? h('p', { className: 'dn-modal-error' }, t('link.truncated')) : null,
               h('details', null, h('summary', null, t('page.preview')), h('pre', { className: 'dn-modal-preview' }, data.prompt)),
             ) : data && modal.kind === 'save' ? h(React.Fragment, null,
-              field(t('link.save'), h('select', { value: saveMode, disabled: busy, onChange: (event) => setSaveMode(event.target.value) },
+              field(t('link.save'), h('select', { value: saveMode, disabled: busy || folderBusy, onChange: (event) => {
+                const next = event.target.value
+                setSaveMode(next)
+                if (next === 'append') { setFolderDraft(null); setFolderError('') }
+              } },
                 h('option', { value: 'create' }, t('link.createNote')), h('option', { value: 'append' }, t('link.appendNote')))),
               saveMode === 'create' ? h(React.Fragment, null,
                 field(t('link.title'), h('input', { value: title, disabled: busy, onChange: (event) => setTitle(event.target.value) })),
-                field(t('link.folder'), h('select', { value: folder, disabled: busy, onChange: (event) => setFolder(event.target.value) },
-                  h('option', { value: '' }, t('page.allNotes')), data.folders.map((item) => h('option', { key: item.path, value: item.path }, item.path)))),
-              ) : field(t('link.target'), h('select', { value: targetNote, disabled: busy, onChange: (event) => setTargetNote(event.target.value) },
-                h('option', { value: '' }, t('link.target')), data.notes.map((note) => h('option', { key: note.id, value: note.id }, note.title + (parentFolder(note.id) ? ' · ' + parentFolder(note.id) : ''))))),
+                h('div', { className: 'dn-folderfield' },
+                  h('label', { htmlFor: 'dn-save-folder' }, t('link.folder')),
+                  h('div', { className: 'dn-folderpick' },
+                    h('select', { id: 'dn-save-folder', ref: folderSelectRef, value: folder, disabled: busy || folderBusy || folderDraft !== null, onChange: (event) => setFolder(event.target.value) },
+                      h('option', { value: '' }, t('link.vaultRoot')),
+                      [...data.folders]
+                        .sort((left, right) => left.path.localeCompare(right.path, 'zh-CN', { numeric: true }))
+                        .map((item) => h('option', { key: item.path, value: item.path }, item.path))),
+                    h('button', { type: 'button', className: 'dn-folderadd', ref: folderAddRef, title: t('page.newFolder'), 'aria-label': t('page.newFolder'), 'aria-expanded': folderDraft !== null, 'aria-controls': folderDraft !== null ? 'dn-new-folder' : undefined, disabled: busy || folderBusy || folderDraft !== null, onClick: beginFolder }, ICONS.plus()),
+                  ),
+                ),
+                folderDraft !== null ? h('form', { className: 'dn-folderform dn-foldercreate', onSubmit: createFolder },
+                  h('label', { htmlFor: 'dn-new-folder' }, t('page.newFolder') + ' · ' + (folder || t('link.vaultRoot'))),
+                  h('input', { id: 'dn-new-folder', autoFocus: true, value: folderDraft, placeholder: t('page.folderName'), disabled: folderBusy, onChange: (event) => { setFolderDraft(event.target.value); setFolderError('') } }),
+                  folderError ? h('span', { className: 'dn-foldererror', role: 'alert' }, folderError) : null,
+                  h('div', { className: 'dn-folderform-actions' },
+                    h('button', { type: 'button', className: 'dn-iconbtn', disabled: folderBusy, onClick: cancelFolder }, t('page.cancel')),
+                    h('button', { type: 'submit', className: 'dn-new', disabled: folderBusy || folderDraft.trim() === '' }, t('page.create')),
+                  ),
+                ) : null,
+              ) : h(NoteTargetPicker, { notes: data.notes, value: targetNote, disabled: busy, onChange: setTargetNote }),
               h('pre', { className: 'dn-modal-preview' }, data.answer.content),
             ) : data && modal.kind === 'source' ? h(React.Fragment, null,
               h('p', { className: 'dn-modal-hint' }, bridge.sessionLabel(modal.sessionId) + ' · Turn ' + data.answer.turn + ' · ' + new Date(data.answer.time).toLocaleString()),
@@ -1367,7 +1643,7 @@ window.__ModuleLoader__.load({
             ) : null,
           ),
           !result && data && ['join', 'save'].includes(modal.kind) ? h('div', { className: 'dn-modal-actions' },
-            h('button', { className: 'dn-modal-primary', onClick: run, disabled: busy || (modal.kind === 'save' && (saveMode === 'append' ? !targetNote : !title.trim())) }, busy ? t('page.saving') : t(modal.kind === 'join' ? 'link.join' : 'link.save')),
+            h('button', { className: 'dn-modal-primary', onClick: run, disabled: busy || (modal.kind === 'save' && (saveMode === 'append' ? !targetNote : (!title.trim() || folderDraft !== null))) }, busy ? t('page.saving') : t(modal.kind === 'join' ? 'link.join' : 'link.save')),
           ) : null,
         ),
       )
@@ -1379,7 +1655,12 @@ window.__ModuleLoader__.load({
     }
 
     function AnswerSaveAction({ bridge, sessionId, messageId }) {
-      return h('button', { className: 'dn-answer-action', title: translate('link.saveAnswer'), onClick: () => bridge.show('save', { sessionId, messageId }) }, ICONS.deposit(), h('span', null, translate('link.saveAnswer')))
+      const label = translate('link.saveAnswer')
+      return h(Tip, { label }, h('button', {
+        type: 'button',
+        className: 'dn-answer-action',
+        onClick: () => bridge.show('save', { sessionId, messageId }),
+      }, ICONS.deposit()))
     }
 
     function RelatedNotesAction({ bridge, sessionId }) {
