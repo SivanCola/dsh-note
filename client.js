@@ -1755,7 +1755,9 @@ window.__ModuleLoader__.load({
               h('span', { className: 'dn-tree-caret' + (open ? ' open' : '') }, ICONS.chevron()),
               h('span', { className: 'dn-tree-icon' }, ICONS.folder()),
               h('span', { className: 'dn-tree-label', title: folder.path }, folder.name),
-              h('button', { className: 'dn-listaction dn-folder-add', title: t('page.newInFolder'), onClick: (event) => { event.stopPropagation(); onCreate(folder.path) } }, ICONS.plus()),
+              h(Tip, { label: t('page.newInFolder') },
+                h('button', { className: 'dn-listaction dn-folder-add', onClick: (event) => { event.stopPropagation(); onCreate(folder.path) } }, ICONS.plus()),
+              ),
             ),
             open ? h('ul', { role: 'group', style: { '--dn-level': level } }, render(folder, level + 1)) : null,
           )
@@ -2072,20 +2074,24 @@ window.__ModuleLoader__.load({
             h('button', { className: 'dn-hdrbtn', disabled: status !== 'saved' || draft.dirty(),
               title: status !== 'saved' ? t('link.waitSave') : t('link.join'),
               onMouseDown: (event) => event.preventDefault(), onClick: joinConversation }, t('link.join')),
-            h(
-              'button',
-              { className: 'dn-iconbtn' + (note.starred ? ' on' : ''), title: t(note.starred ? 'page.unstar' : 'page.star'), 'aria-pressed': note.starred, disabled: flagBusy, onClick: () => toggleFlag('starred') },
-              ICONS.starred(),
+            h(Tip, { label: t(note.starred ? 'page.unstar' : 'page.star') },
+              h(
+                'button',
+                { className: 'dn-iconbtn' + (note.starred ? ' on' : ''), 'aria-pressed': note.starred, disabled: flagBusy, onClick: () => toggleFlag('starred') },
+                ICONS.starred(),
+              ),
             ),
-            h(
-              'button',
-              { className: 'dn-iconbtn' + (note.pinned ? ' on' : ''), title: t(note.pinned ? 'page.unpin' : 'page.pin'), 'aria-pressed': note.pinned, disabled: flagBusy, onClick: () => toggleFlag('pinned') },
-              ICONS.pin(),
+            h(Tip, { label: t(note.pinned ? 'page.unpin' : 'page.pin') },
+              h(
+                'button',
+                { className: 'dn-iconbtn' + (note.pinned ? ' on' : ''), 'aria-pressed': note.pinned, disabled: flagBusy, onClick: () => toggleFlag('pinned') },
+                ICONS.pin(),
+              ),
             ),
             h(
               'details',
               { className: 'dn-more' },
-              h('summary', { className: 'dn-iconbtn', title: t('page.more'), 'aria-label': t('page.more') }, ICONS.more()),
+              h(Tip, { label: t('page.more') }, h('summary', { className: 'dn-iconbtn' }, ICONS.more())),
               h(
                 'div',
                 { className: 'dn-more-menu', role: 'menu' },
@@ -2196,7 +2202,7 @@ window.__ModuleLoader__.load({
                 ? h(
                     'details',
                     { className: 'dn-toolmenu', key: tool.key },
-                    h('summary', { className: 'dn-tool', title: tool.title, 'aria-label': tool.title }, ICONS.heading()),
+                    h(Tip, { label: tool.title }, h('summary', { className: 'dn-tool' }, ICONS.heading())),
                     h(
                       'div',
                       { className: 'dn-toolmenu-panel', role: 'menu' },
@@ -2218,16 +2224,17 @@ window.__ModuleLoader__.load({
                     ),
                   )
                 : h(
-                    'button',
-                    {
-                      className: 'dn-tool',
-                      key: tool.key,
-                      title: tool.title,
-                      'aria-label': tool.title,
-                      onMouseDown: (event) => event.preventDefault(),
-                      onClick: tool.run,
-                    },
-                    tool.icon(),
+                    Tip,
+                    { key: tool.key, label: tool.title },
+                    h(
+                      'button',
+                      {
+                        className: 'dn-tool',
+                        onMouseDown: (event) => event.preventDefault(),
+                        onClick: tool.run,
+                      },
+                      tool.icon(),
+                    ),
                   ),
           ),
         ) : null,
@@ -2636,9 +2643,9 @@ window.__ModuleLoader__.load({
                 }, ICONS.refresh(), h('span', { className: 'dn-viewlabel' }, t('status.refresh'))),
               ),
             ),
-            view !== 'todos' ? h('button', { className: 'dn-listaction', title: t('page.newFolder'), onClick: () => { setFolderParent(activeFolder); setFolderDraft(''); setFolderError('') } }, ICONS.folder()) : null,
-            searching || view === 'todos' ? null : h('button', { className: 'dn-listaction', title: layout === 'tree' ? t('page.showSummary') : t('page.showTree'), onClick: () => setLayout(layout === 'tree' ? 'summary' : 'tree') }, layout === 'tree' ? ICONS.summary() : ICONS.tree()),
-            view === 'todos' ? null : h('button', { className: 'dn-listaction', title: sort === 'updated' ? t('page.sortTitle') : t('page.sortUpdated'), onClick: () => setSort(sort === 'updated' ? 'title' : 'updated') }, ICONS.sort()),
+            view !== 'todos' ? h(Tip, { label: t('page.newFolder') }, h('button', { className: 'dn-listaction', onClick: () => { setFolderParent(activeFolder); setFolderDraft(''); setFolderError('') } }, ICONS.folder())) : null,
+            searching || view === 'todos' ? null : h(Tip, { label: layout === 'tree' ? t('page.showSummary') : t('page.showTree') }, h('button', { className: 'dn-listaction', onClick: () => setLayout(layout === 'tree' ? 'summary' : 'tree') }, layout === 'tree' ? ICONS.summary() : ICONS.tree())),
+            view === 'todos' ? null : h(Tip, { label: sort === 'updated' ? t('page.sortTitle') : t('page.sortUpdated') }, h('button', { className: 'dn-listaction', onClick: () => setSort(sort === 'updated' ? 'title' : 'updated') }, ICONS.sort())),
           ),
           folderDraft !== null ? h('form', { className: 'dn-folderform', onSubmit: createFolder },
             h('label', { htmlFor: 'dn-folder-name' }, t('page.newFolder') + ' · ' + (folderParent || t('page.allNotes'))),
@@ -3345,29 +3352,29 @@ window.__ModuleLoader__.load({
             h(
               'div',
               { className: 'dn-right-detailhead' },
-              h(
-                'button',
-                {
-                  className: 'dn-right-icon dn-right-back',
-                  type: 'button',
-                  title: t('right.back'),
-                  'aria-label': t('right.back'),
-                  ref: backRef,
-                  onClick: backToList,
-                },
-                ICONS.chevron(),
+              h(Tip, { label: t('right.back') },
+                h(
+                  'button',
+                  {
+                    className: 'dn-right-icon dn-right-back',
+                    type: 'button',
+                    ref: backRef,
+                    onClick: backToList,
+                  },
+                  ICONS.chevron(),
+                ),
               ),
               h('span', { className: 'dn-right-detailtitle', title: selected.title }, selected.title || selected.id),
-              h(
-                'button',
-                {
-                  className: 'dn-right-icon',
-                  type: 'button',
-                  title: t('right.openPanel'),
-                  'aria-label': t('right.openPanel'),
-                  onClick: () => bridge.openNote(selected.id),
-                },
-                ICONS.open(16),
+              h(Tip, { label: t('right.openPanel') },
+                h(
+                  'button',
+                  {
+                    className: 'dn-right-icon',
+                    type: 'button',
+                    onClick: () => bridge.openNote(selected.id),
+                  },
+                  ICONS.open(16),
+                ),
               ),
             ),
             h(
@@ -3406,29 +3413,29 @@ window.__ModuleLoader__.load({
                 { className: 'dn-right-title', title: workspace?.path || undefined },
                 workspace ? workspaceName : t('right.title'),
               ),
-              h(
-                'button',
-                {
-                  className: 'dn-right-icon',
-                  type: 'button',
-                  title: t('right.newNote'),
-                  'aria-label': t('right.newNote'),
-                  disabled: busy || vault.loading,
-                  onClick: createNote,
-                },
-                ICONS.plus(),
+              h(Tip, { label: t('right.newNote') },
+                h(
+                  'button',
+                  {
+                    className: 'dn-right-icon',
+                    type: 'button',
+                    disabled: busy || vault.loading,
+                    onClick: createNote,
+                  },
+                  ICONS.plus(),
+                ),
               ),
-              h(
-                'button',
-                {
-                  className: 'dn-right-icon' + (vault.loading ? ' is-busy' : ''),
-                  type: 'button',
-                  title: t('right.refresh'),
-                  'aria-label': t('right.refresh'),
-                  disabled: vault.loading,
-                  onClick: vault.refresh,
-                },
-                ICONS.refresh(),
+              h(Tip, { label: t('right.refresh') },
+                h(
+                  'button',
+                  {
+                    className: 'dn-right-icon' + (vault.loading ? ' is-busy' : ''),
+                    type: 'button',
+                    disabled: vault.loading,
+                    onClick: vault.refresh,
+                  },
+                  ICONS.refresh(),
+                ),
               ),
             ),
             h(
